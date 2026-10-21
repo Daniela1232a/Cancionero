@@ -1,0 +1,1921 @@
+<!DOCTYPE html>
+<html lang="es"><head><script data-bard-client-injected="true">(function(firebaseConfig, initialAuthToken, appId) {
+        window.__firebase_config = firebaseConfig;
+        window.__initial_auth_token = initialAuthToken;
+        window.__app_id = appId;
+            })("\n{\n  \"apiKey\": \"AIzaSyCqyCcs2R2e7AegGjvFAwG98wlamtbHvZY\",\n  \"authDomain\": \"bard-frontend.firebaseapp.com\",\n  \"projectId\": \"bard-frontend\",\n  \"storageBucket\": \"bard-frontend.firebasestorage.app\",\n  \"messagingSenderId\": \"175205271074\",\n  \"appId\": \"1:175205271074:web:2b7bd4d34d33bf38e6ec7b\"\n}\n","eyJhbGciOiJSUzI1NiIsImtpZCI6IjExNjRiNzdiNDMzZDdhMDAyMWI4NjE4YjhjYTU3ZTMyZGI5MWUxMTMiLCJ0eXAiOiJKV1QifQ.eyJzdWIiOiJmaXJlYmFzZS1hZG1pbnNkay1mYnN2Y0BiYXJkLWZyb250ZW5kLmlhbS5nc2VydmljZWFjY291bnQuY29tIiwiYXVkIjoiaHR0cHM6Ly9pZGVudGl0eXRvb2xraXQuZ29vZ2xlYXBpcy5jb20vZ29vZ2xlLmlkZW50aXR5LmlkZW50aXR5dG9vbGtpdC52MS5JZGVudGl0eVRvb2xraXQiLCJ1aWQiOiIxMTA3MDM2Njk1NzU2NjQwMzIyNSIsImlzcyI6ImZpcmViYXNlLWFkbWluc2RrLWZic3ZjQGJhcmQtZnJvbnRlbmQuaWFtLmdzZXJ2aWNlYWNjb3VudC5jb20iLCJjbGFpbXMiOnsiYXBwSWQiOiJjXzhlNjgzYzFmNTZmMTBiMGRfaW5kZXguaHRtbC04NDgifSwiZXhwIjoxNzkyNjA1MjgxLCJpYXQiOjE3OTI2MDE2ODEsImFsZyI6IlJTMjU2In0.jI_Jr086vYbNjyg4Bj-tiJgrSvS-LzLOCDtmEztMMI0veOMvCflZyFnYxvXmHkOYnokZONC223PMNq8KdS0CLBx6aUPIMfAxUeda79H42QPHNeAa0Zk9p-A-k8OT2EpoSmGO2H185uPmFuxsZvxV2vgkNVcopYBd0OAAHgyuajJVdHEvKWQEi0Hd_b33-SCid1t27JmxZKCfrF_kqJb2st4R3l25iiEMsOvm0JEmKzQytSCokGHo93jbp0DPvS_GKiFmsRxEFBGAGn9dTzJQZZYed48D1zYBgj2yRmwo26Ts6YmEquxoSryTvxm8ja778uwOimp94j7g9MVFa01rSQ","c_8e683c1f56f10b0d_index.html-848")</script><script data-bard-client-injected="true">
+  document.addEventListener('input', (event) => {
+    if (event.target && (event.target.isContentEditable || event.target.hasAttribute('contenteditable'))) {
+      const clonedDoc = document.cloneNode(true);
+      const injectedScripts = clonedDoc.querySelectorAll('[data-bard-client-injected="true"]');
+      injectedScripts.forEach(el => el.remove());
+      window.parent.postMessage({
+        type: 'inlineEdit',
+        html: '<!DOCTYPE html>\n' + clonedDoc.documentElement.outerHTML
+      }, '*');
+    }
+  });
+</script><script data-bard-client-injected="true">(function(){'use strict';window.addEventListener("message",a=>{a.data&&a.data.type==="SUPPLEMENTAL_DATA_UPDATE"&&window.dispatchEvent(new CustomEvent("supplementaldataupdate",{detail:a.data.data}))});}).call(this);
+</script><script data-bard-client-injected="true">(function() {
+  const SCROLL_KEYS = new Set([
+    'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight',
+    ' ', 'Spacebar', 'PageUp', 'PageDown', 'Home', 'End',
+  ]);
+  const HORIZONTAL_KEYS = new Set(['ArrowLeft', 'ArrowRight']);
+
+  function isTextEntryTarget(target) {
+    if (!target) return false;
+    const tagName = target.tagName;
+    return tagName === 'INPUT' || tagName === 'TEXTAREA' ||
+        tagName === 'SELECT' || target.isContentEditable === true;
+  }
+
+  // An element absorbs the key only if it both overflows on the axis being
+  // scrolled and is configured to scroll on that axis. The cheap dimension
+  // test runs first because getComputedStyle forces a style recalc, and this
+  // runs on every keypress. Each axis is read from its own longhand: the
+  // 'overflow' shorthand serializes as two values when the axes differ, which
+  // is the common 'overflow-x: hidden; overflow-y: auto' pane.
+  function canScroll(node, horizontal) {
+    const overflows = horizontal ? node.scrollWidth > node.clientWidth
+                                 : node.scrollHeight > node.clientHeight;
+    if (!overflows) return false;
+    const style = window.getComputedStyle(node);
+    const overflow = horizontal ? style.overflowX : style.overflowY;
+    return overflow === 'auto' || overflow === 'scroll';
+  }
+
+  // Walks up from the event target so nested scrollers keep their behavior.
+  // <body> is included because pages that pin the root height make it the
+  // scroll container.
+  function hasScrollableAncestor(target, horizontal) {
+    let node = target;
+    while (node && node !== document.documentElement) {
+      if (canScroll(node, horizontal)) return true;
+      node = node.parentElement;
+    }
+    return false;
+  }
+
+  function rootCanScroll(horizontal) {
+    const scroller = document.scrollingElement || document.documentElement;
+    if (!scroller) return false;
+    // Tolerate a pixel of rounding so subpixel layouts do not look scrollable.
+    return horizontal ? scroller.scrollWidth > window.innerWidth + 1
+                      : scroller.scrollHeight > window.innerHeight + 1;
+  }
+
+  window.addEventListener('keydown', function(event) {
+    if (!SCROLL_KEYS.has(event.key)) return;
+    if (event.defaultPrevented) return;
+    // Alt and Meta turn arrows into browser history navigation, and Ctrl is
+    // reserved for shortcuts, so none of them are scroll intent.
+    if (event.altKey || event.metaKey || event.ctrlKey) return;
+
+    const target = event.target;
+    if (isTextEntryTarget(target)) return;
+
+    // Anything that can still absorb the scroll gets to keep it.
+    const horizontal = HORIZONTAL_KEYS.has(event.key);
+    if (rootCanScroll(horizontal)) return;
+    if (hasScrollableAncestor(target, horizontal)) return;
+
+    event.preventDefault();
+  }, {capture: true, passive: false});
+})();</script><script data-bard-client-injected="true">(function() {
+  // Ensure this script is executed only once
+  if (window.firebaseAuthBridgeScriptLoaded) {
+    return;
+  }
+  window.firebaseAuthBridgeScriptLoaded = true;
+
+  let nextTokenPromiseId = 0;
+
+  // Stores { resolve, reject } for ongoing token requests
+  const pendingTokenPromises = {};
+
+  // Listen for messages from the Host Application
+  window.addEventListener('message', function(event) {
+
+    const messageData = event.data;
+
+  if (messageData && messageData.type === 'RESOLVE_NEW_FIREBASE_TOKEN') {
+      const { success, token, error, promiseId } = messageData ?? {};
+      if (pendingTokenPromises[promiseId]) {
+        if (success) {
+          pendingTokenPromises[promiseId].resolve(token);
+        } else {
+          pendingTokenPromises[promiseId].reject(new Error(error || 'Token refresh failed from host.'));
+        }
+        delete pendingTokenPromises[promiseId];
+      }
+    }
+  });
+
+  // Expose a function for the Generated App to request a new Firebase token
+  window.requestNewFirebaseToken = function() {
+    const currentPromiseId = nextTokenPromiseId++;
+    const promise = new Promise((resolve, reject) => {
+      pendingTokenPromises[currentPromiseId] = { resolve, reject };
+    });
+    if (window.parent && window.parent !== window) {
+      window.parent.postMessage({
+        type: 'REQUEST_NEW_FIREBASE_TOKEN',
+        promiseId: currentPromiseId
+      }, '*');
+    } else {
+      pendingTokenPromises[currentPromiseId].reject(new Error('No parent window to request token from.'));
+      delete pendingTokenPromises[currentPromiseId];
+    }
+    return promise;
+  };
+})();</script><script data-bard-client-injected="true">
+let realOriginalGetUserMedia = null;
+if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+  realOriginalGetUserMedia = navigator.mediaDevices.getUserMedia.bind(navigator.mediaDevices);
+}
+
+(function() {
+  if (navigator.mediaDevices && navigator.mediaDevices.__proto__) {
+    try {
+      Object.defineProperty(navigator.mediaDevices.__proto__, 'getUserMedia', {
+        get: function() {
+          return undefined; // Or throw an error
+        },
+        configurable: false
+      });
+    } catch (error) {
+      console.error("Error defining prototype getter:", error);
+    }
+  }
+})();
+
+(function() {
+  const pendingMediaResolvers = {};
+  let nextMediaPromiseId = 0;
+
+  function requestMediaPermissions(constraints) {
+    const mediaPromiseId = nextMediaPromiseId++;
+    const promise = new Promise((resolve, reject) => {
+      pendingMediaResolvers[mediaPromiseId] = (granted) => {
+        delete pendingMediaResolvers[mediaPromiseId];
+        resolve(granted);
+      };
+    });
+
+    window.parent.postMessage({
+      type: 'requestMediaPermission',
+      constraints: constraints,
+      promiseId: mediaPromiseId,
+    }, '*');
+
+    return promise;
+  }
+
+  let originalGetUserMedia = realOriginalGetUserMedia;
+
+  function interceptGetUserMedia() {
+    if (navigator.mediaDevices) {
+      Object.defineProperty(navigator.mediaDevices, 'getUserMedia', {
+        value: function(constraints) {
+          return requestMediaPermissions(constraints).then((granted) => {
+            if (granted) {
+              if (originalGetUserMedia) {
+                return originalGetUserMedia(constraints);
+              } else {
+                throw new Error("Original getUserMedia not available.");
+              }
+            } else {
+              throw new DOMException('Permission denied', 'NotAllowedError');
+            }
+          });
+        },
+        writable: false,
+        configurable: false
+      });
+    }
+  }
+
+  interceptGetUserMedia();
+
+  const observer = new MutationObserver(function(mutationsList, observer) {
+    for (const mutation of mutationsList) {
+      if (mutation.type === 'reconfigured' && mutation.name === 'getUserMedia' && mutation.object === navigator.mediaDevices) {
+        interceptGetUserMedia();
+      } else if (mutation.type === 'attributes' && mutation.attributeName === 'getUserMedia' && mutation.target === navigator.mediaDevices) {
+        interceptGetUserMedia();
+      } else if (mutation.type === 'childList' && mutation.addedNodes) {
+        mutation.addedNodes.forEach(node => {
+          if (node === navigator.mediaDevices) {
+            interceptGetUserMedia();
+          }
+        });
+      }
+    }
+  });
+
+  function interceptSpeechRecognition() {
+    if (!window.SpeechRecognition && !window.webkitSpeechRecognition) {
+      return;
+    }
+
+    const OriginalSpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+    const SpeechRecognitionWrapper = function(...args) {
+      const recognizer = new OriginalSpeechRecognition(...args);
+      const originalStart = recognizer.start.bind(recognizer);
+
+      recognizer.start = function() {
+        requestMediaPermissions({ audio: true }).then(granted => {
+          if (granted) {
+            originalStart();
+          } else {
+            const errorEvent = new SpeechRecognitionErrorEvent('error');
+            errorEvent.error = 'not-allowed'; // This is the standard error for permission denial.
+            recognizer.dispatchEvent(errorEvent);
+          }
+        });
+      };
+
+      return recognizer;
+    };
+
+    SpeechRecognitionWrapper.prototype = OriginalSpeechRecognition.prototype;
+    SpeechRecognitionWrapper.prototype.constructor = SpeechRecognitionWrapper;
+
+    if (window.SpeechRecognition) {
+      window.SpeechRecognition = SpeechRecognitionWrapper;
+    }
+    if (window.webkitSpeechRecognition) {
+      window.webkitSpeechRecognition = SpeechRecognitionWrapper;
+    }
+  }
+
+  interceptSpeechRecognition();
+
+  window.addEventListener('message', function(event) {
+    if (event.data) {
+      if (event.data.type === 'resolveMediaPermission') {
+        const { promiseId, granted } = event.data;
+        if (pendingMediaResolvers[promiseId]) {
+          pendingMediaResolvers[promiseId](granted);
+        }
+      }
+    }
+  });
+
+})();</script><script ws-interception-config="{&quot;parentOrigin&quot;:&quot;https://gemini.google.com&quot;,&quot;proxiedDomains&quot;:[]}" data-bard-client-injected="true">(function(){'use strict';var u=typeof Object.defineProperties=="function"?Object.defineProperty:function(b,d,e){if(b==Array.prototype||b==Object.prototype)return b;b[d]=e.value;return b};function v(b){b=["object"==typeof globalThis&&globalThis,b,"object"==typeof window&&window,"object"==typeof self&&self,"object"==typeof global&&global];for(var d=0;d<b.length;++d){var e=b[d];if(e&&e.Math==Math)return e}throw Error("Cannot find global object");}var w=v(this);
+function y(b,d){if(d)a:{var e=w;b=b.split(".");for(var h=0;h<b.length-1;h++){var k=b[h];if(!(k in e))break a;e=e[k]}b=b[b.length-1];h=e[b];d=d(h);d!=h&&d!=null&&u(e,b,{configurable:!0,writable:!0,value:d})}}function z(b){function d(h){return b.next(h)}function e(h){return b.throw(h)}return new Promise(function(h,k){function m(n){n.done?h(n.value):Promise.resolve(n.value).then(d,e).then(m,k)}m(b.next())})}y("globalThis",function(b){return b||w});/*
+
+ Copyright The Closure Library Authors.
+ SPDX-License-Identifier: Apache-2.0
+*/
+function A(b,d){function e(){}e.prototype=d.prototype;b.j=d.prototype;b.prototype=new e;b.prototype.constructor=b;b.h=function(h,k,m){for(var n=Array(arguments.length-2),p=2;p<arguments.length;p++)n[p-2]=arguments[p];return d.prototype[k].apply(h,n)}};function B(b,d,e="*"){function h(a){if(typeof a==="string")return F.encode(a).buffer;if(a instanceof ArrayBuffer)return a.slice(0);if(ArrayBuffer.isView(a))return a.buffer.slice(a.byteOffset,a.byteOffset+a.byteLength);throw Error("Invalid data type");}function k(a){a=h(a);var f={type:"send",data:new Uint8Array(a)},g;(g=r)==null||g.postMessage(f,[a])}function m(){if(!r)throw Error("Data port not captured yet.");r.onmessage=a=>{if(a.data.type==="message"){a=new MessageEvent("message",{data:G.decode(a.data.data)});
+let f;(f=c.onmessage)==null||f.call(c,a);c.dispatchEvent(a)}}}function n(){if(!t)throw Error("Control port not captured yet.");t.onmessage=a=>{switch(a.data.type){case "open":l=1;var f=new Event("open"),g;(g=c.onopen)==null||g.call(c,f);c.dispatchEvent(f);q.forEach(H=>{k(H)});q=[];break;case "close":g=a.data;l=3;g=new CloseEvent("close",{code:g.code,reason:g.reason,wasClean:g.wasClean});(f=c.onclose)==null||f.call(c,g);c.dispatchEvent(g);break;case "error":l=3;f=new Event("error");let x;(x=c.onerror)==
+null||x.call(c,f);c.dispatchEvent(f)}}}function p(a){return z(function*(){var f=new MessageChannel;t=f.port1;var g=new MessageChannel;r=g.port1;n();m();window.parent.postMessage({type:"websocket_open",portOrdering:["control","data"],url:b,protocols:a||[],connectionId:I},e,[f.port2,g.port2])}())}var c=Reflect.construct(EventTarget,[],new.target);c.CONNECTING=0;c.OPEN=1;c.CLOSING=2;c.CLOSED=3;c.url=b;c.binaryType="arraybuffer";c.protocol="";c.i="";var l=0,t=null,r=null,q=[],F=new TextEncoder,G=new TextDecoder;
+c.onopen=null;c.onmessage=null;c.onclose=null;c.onerror=null;Object.defineProperty(c,"readyState",{get:()=>l,enumerable:!0,configurable:!0});Object.defineProperty(c,"bufferedAmount",{get:()=>{var a=0;q.forEach(f=>{a+=typeof f==="string"?f.length:f.byteLength});return a},enumerable:!0,configurable:!0});var I=function(){var a;return((a=globalThis.crypto)==null?0:a.randomUUID)?globalThis.crypto.randomUUID():"xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g,f=>{var g=Math.random()*16|0;return(f===
+"x"?g:g&3|8).toString(16)})}();c.send=a=>{if(l===1)a instanceof Blob?a.arrayBuffer().then(f=>{k(f)}):k(a);else if(l===0)if(typeof a==="string")q.push(a);else if(a instanceof ArrayBuffer||ArrayBuffer.isView(a))q.push(h(a));else throw Error("Sending Blob is not supported before the connection is open.");else console.debug("WebSocket send called in CLOSING or CLOSED state; ignored.")};c.close=(a=1E3,f="")=>{if(l!==2&&l!==3){l=2;a={type:"close",code:a,reason:f,wasClean:a===1E3};var g;(g=t)==null||g.postMessage(a)}};
+Promise.resolve().then(()=>p(d));return c}A(B,EventTarget);var C=document.currentScript,D=C==null?void 0:C.getAttribute("ws-interception-config");if(!D)throw Error("WebSocket Interceptor: Missing ws-interception-config attribute in the script tag.");var E=JSON.parse(D);if(!E.parentOrigin||typeof E.parentOrigin!=="string")throw Error("WebSocket Interceptor: Invalid parentOrigin in ws-interception-config");
+(function(b){var d=Object.getOwnPropertyDescriptor(window,"WebSocket");if(!d||d.writable||d.configurable)d=Object.assign(function(e,h){try{let k=(new URL(e)).hostname;if(b.proxiedDomains.some(m=>k===m||k.endsWith(`.${m}`)))return new B(e,h,b.parentOrigin)}catch(k){throw window.parent.postMessage({type:"websocket_blocked",url:e,reason:"blocked_invalid_url"},b.parentOrigin),new DOMException(`WebSocket connection to '${e}' is not allowed in Canvas.`,"SecurityError");}window.parent.postMessage({type:"websocket_blocked",
+url:e,reason:"blocked_domain_not_allowlisted"},b.parentOrigin);throw new DOMException(`WebSocket connection to '${e}' is not allowed in Canvas.`,"SecurityError");},{CONNECTING:0,OPEN:1,CLOSING:2,CLOSED:3}),Object.defineProperty(window,"WebSocket",{value:d,writable:!1,configurable:!1})})({proxiedDomains:E.proxiedDomains||[],parentOrigin:E.parentOrigin});}).call(this);
+</script><script data-bard-client-injected="true">((function(modelInformation) {
+  const originalFetch = window.fetch;
+  // TODO: b/421908508 - Move these out of the script and match all generative AI model calls.
+  let googleLlmBaseApiUrls = [
+    'https://generativelanguage.googleapis.com/v1beta/models/' + modelInformation.textModelName + ':streamGenerateContent',
+    'https://generativelanguage.googleapis.com/v1beta/models/' + modelInformation.textModelName + ':generateContent',
+    'https://generativelanguage.googleapis.com/v1beta/models/' + modelInformation.imageModelName + ':predict',
+    'https://generativelanguage.googleapis.com/v1beta/models/' + modelInformation.imageModelName + ':predictLongRunning',
+    'https://generativelanguage.googleapis.com/v1beta/models/' + modelInformation.imageEditModelName + ':generateContent',
+    'https://generativelanguage.googleapis.com/v1beta/models/' + modelInformation.imageTransformModelName + ':generateContent',
+    'https://generativelanguage.googleapis.com/v1beta/models/' + modelInformation.videoModelName + ':predict',
+    'https://generativelanguage.googleapis.com/v1beta/models/' + modelInformation.videoModelName + ':predictLongRunning',
+    'https://generativelanguage.googleapis.com/v1beta/models/' + modelInformation.ttsModelName + ':generateContent',
+  ];
+  modelInformation.deprecatedTextModelNames.forEach((modelName) => {
+    googleLlmBaseApiUrls.push(
+      'https://generativelanguage.googleapis.com/v1beta/models/' + modelName + ':streamGenerateContent',
+      'https://generativelanguage.googleapis.com/v1beta/models/' + modelName + ':generateContent',
+    );
+  });
+  modelInformation.deprecatedImageModelNames.forEach((modelName) => {
+    googleLlmBaseApiUrls.push(
+      'https://generativelanguage.googleapis.com/v1beta/models/' + modelName + ':predict',
+      'https://generativelanguage.googleapis.com/v1beta/models/' + modelName + ':predictLongRunning',
+      'https://generativelanguage.googleapis.com/v1beta/models/' + modelName + ':generateContent',
+      'https://generativelanguage.googleapis.com/v1beta/models/' + modelName + ':streamGenerateContent',
+    );
+  });
+  modelInformation.deprecatedGenerateImageModelNames.forEach((modelName) => {
+    googleLlmBaseApiUrls.push(
+      'https://generativelanguage.googleapis.com/v1beta/models/' + modelName + ':generateContent',
+      'https://generativelanguage.googleapis.com/v1beta/models/' + modelName + ':streamGenerateContent',
+    );
+  });
+  modelInformation.deprecatedImageTransformModelNames.forEach((modelName) => {
+    googleLlmBaseApiUrls.push(
+      'https://generativelanguage.googleapis.com/v1beta/models/' + modelName + ':generateContent',
+      'https://generativelanguage.googleapis.com/v1beta/models/' + modelName + ':streamGenerateContent',
+    );
+  });
+
+  const pendingFetchResolvers = {};
+  let nextPromiseId = 0;
+
+  function handleStringInput(input, optionsArgument) {
+    const actualUrl = input;
+    const fetchCallArgs = [actualUrl, optionsArgument];
+    const effectiveOptions = optionsArgument || {};
+    const bodyForApiKeyCheck = effectiveOptions.body;
+    const bodyForPostMessage = effectiveOptions.body;
+    return { actualUrl, fetchCallArgs, effectiveOptions, bodyForApiKeyCheck, bodyForPostMessage };
+  }
+
+  function handleRequestInput(input, optionsArgument) {
+    const actualUrl = input.url;
+    const fetchCallArgs = [input, optionsArgument];
+    const effectiveOptions = { method: input.method, headers: new Headers(input.headers) };
+    let bodyForApiKeyCheck;
+    let bodyForPostMessage;
+
+    if (optionsArgument) {
+      if (optionsArgument.method) effectiveOptions.method = optionsArgument.method;
+      if (optionsArgument.headers) effectiveOptions.headers = new Headers(optionsArgument.headers);
+      if ('body' in optionsArgument) {
+        bodyForApiKeyCheck = optionsArgument.body;
+        bodyForPostMessage = optionsArgument.body;
+      } else {
+        bodyForApiKeyCheck = undefined;
+        bodyForPostMessage = input.body;
+      }
+    } else {
+      bodyForApiKeyCheck = undefined;
+      bodyForPostMessage = input.body;
+    }
+    return { actualUrl, fetchCallArgs, effectiveOptions, bodyForApiKeyCheck, bodyForPostMessage };
+  }
+
+  window.fetch = function(input, optionsArgument) {
+    let actualUrl;
+    let fetchCallArgs;
+    let effectiveOptions = {};
+    let bodyForApiKeyCheck;
+    let bodyForPostMessage;
+
+    if (typeof input === 'string') {
+      ({actualUrl, fetchCallArgs, effectiveOptions, bodyForApiKeyCheck, bodyForPostMessage} = handleStringInput(input, optionsArgument));
+    } else if (input instanceof Request) {
+      ({actualUrl, fetchCallArgs, effectiveOptions, bodyForApiKeyCheck, bodyForPostMessage} = handleRequestInput(input, optionsArgument));
+    } else {
+      return originalFetch.apply(window, [input, optionsArgument]);
+    }
+
+    effectiveOptions.method = effectiveOptions.method || 'GET';
+    if (!effectiveOptions.headers) {
+      effectiveOptions.headers = new Headers();
+    }
+
+
+    if (typeof actualUrl === 'string' && googleLlmBaseApiUrls.some((url) => actualUrl.startsWith(url))) {
+      let apiKeyIsNull = true;
+
+      const regex = new RegExp("models/([^:]+)");
+      const modelNameMatch = actualUrl.match(regex);
+      const modelName = modelNameMatch ? modelNameMatch[1] : 'unspecified';
+
+
+      try {
+        const urlObject = new URL(actualUrl);  // Use URL object for robust parsing
+        const apiKeyParam = urlObject.searchParams.get('key');
+        if (apiKeyParam) {
+          apiKeyIsNull = false;
+        }
+      } catch (e) {
+        // Continue checks even if URL parsing fails
+      }
+
+      if (apiKeyIsNull && effectiveOptions.headers) {
+        const h = new Headers(effectiveOptions.headers);
+        const apiKeyHeaderValue = h.get('X-API-Key') || h.get('x-api-key');
+        if (apiKeyHeaderValue) {
+          apiKeyIsNull = false;
+          return originalFetch.apply(window, fetchCallArgs);
+        }
+      }
+
+      if (apiKeyIsNull && effectiveOptions.method && ['POST', 'PUT', 'PATCH'].includes(effectiveOptions.method.toUpperCase()) && typeof bodyForApiKeyCheck === 'string') {
+        try {
+          const bodyData = JSON.parse(bodyForApiKeyCheck);
+          if (bodyData && bodyData.apiKey) {
+            apiKeyIsNull = false;
+            return originalFetch.apply(window, fetchCallArgs);
+          }
+        } catch (e) {
+          // Ignore JSON parsing errors
+        }
+      }
+
+      if(apiKeyIsNull) {
+        const promiseId = nextPromiseId++;
+        const promise = new Promise((resolve) => {
+          pendingFetchResolvers[promiseId] = (resolvedResponse) => {
+            delete pendingFetchResolvers[promiseId];
+            resolve(resolvedResponse);
+          };
+        });
+
+        let serializedBodyForPostMessage;
+        if (typeof bodyForPostMessage === 'string' || bodyForPostMessage == null) {
+            serializedBodyForPostMessage = bodyForPostMessage;
+        } else if (bodyForPostMessage instanceof ReadableStream) {
+            serializedBodyForPostMessage = null;
+        } else {
+            try {
+                serializedBodyForPostMessage = JSON.stringify(bodyForPostMessage);
+            } catch (e) {
+                serializedBodyForPostMessage = null;
+            }
+        }
+
+        const messageOptions = {
+            method: effectiveOptions.method,
+            headers: Object.fromEntries(new Headers(effectiveOptions.headers).entries()),
+            body: serializedBodyForPostMessage
+        };
+
+        window.parent.postMessage({
+          type: 'requestFetch',
+          url: actualUrl,
+          modelName: modelName,
+          options: messageOptions,
+          promiseId: promiseId,
+        }, '*');
+
+        return promise;
+      }
+      return originalFetch.apply(window, fetchCallArgs);
+    }
+    return originalFetch.apply(window, fetchCallArgs);
+  };
+
+  window.addEventListener('message', function(event) {
+    if (event.data && event.data.type === 'resolveFetch') {
+      const { promiseId, response } = event.data;
+      if (pendingFetchResolvers[promiseId]) {
+        try {
+          const reconstructedResponse = new Response(response.body, {
+            status: response.status,
+            statusText: response.statusText,
+            headers: new Headers(response.headers),
+          });
+          pendingFetchResolvers[promiseId](reconstructedResponse);
+        } catch (error) {
+          pendingFetchResolvers[promiseId](new Response(null, { status: 500, statusText: "Interceptor Response Reconstruction Error" }));
+        }
+      }
+    }
+  });
+
+}))({"textModelName":"gemini-3-flash-preview","imageModelName":"imagen-4.0-generate-001","imageEditModelName":"gemini-3.1-flash-image","imageTransformModelName":"gemini-3-pro-image","videoModelName":"veo-2.0-generate-001","ttsModelName":"gemini-2.5-flash-preview-tts","deprecatedTextModelNames":["gemini-2.0-flash","gemini-2.5-flash","gemini-2.5-flash-preview-04-17","gemini-2.5-flash-preview-05-20","gemini-2.5-flash-preview-09-2025"],"deprecatedImageModelNames":["imagen-3.0-generate-001","imagen-3.0-generate-002"],"deprecatedGenerateImageModelNames":["gemini-2.5-flash-image-preview","gemini-2.5-flash-image","gemini-3.1-flash-image-preview"],"deprecatedImageTransformModelNames":["gemini-3-pro-image-preview-11-2025"]})</script><script data-bard-client-injected="true">(function(){'use strict';function a(){window.parent.postMessage({type:"interaction"},"*")}window.addEventListener("click",a,{capture:!0,passive:!0});window.addEventListener("touchstart",a,{capture:!0,passive:!0});window.addEventListener("keydown",a,{capture:!0,passive:!0});}).call(this);
+</script><script data-bard-client-injected="true">(function() {
+  const originalConsoleLog = console.log;
+  const originalConsoleError = console.error;
+
+    /**
+   * Normalizes an error event or a promise rejection reason into a structured error object.
+   * @param {*} errorEventOrReason The error object or reason.
+   * @return {object} Structured error data { message, name, stack }.
+   */
+  function getErrorObject(errorEventOrReason) {
+    if (errorEventOrReason instanceof Error) {
+      return {
+        message: errorEventOrReason.message,
+        name: errorEventOrReason.name,
+        stack: errorEventOrReason.stack,
+      };
+    }
+    // Fallback for non-Error objects.
+    try {
+      return {
+        message: JSON.stringify(errorEventOrReason),
+        name: 'UnknownErrorType',
+        stack: null,
+      };
+    } catch (e) {
+      return {
+        message: String(errorEventOrReason),
+        name: 'UnknownErrorTypeNonStringifiable',
+        stack: null,
+      };
+    }
+  }
+
+  /**
+   * Converts an array of arguments (from log/error) into a single string.
+   * Handles Error objects specially to include their message and stack.
+   * @param {Array<*>} args - Arguments passed to console methods.
+   * @return {string} A string representation of the arguments.
+   */
+  function stringifyArgs(args) {
+    return args
+      .map((arg) => {
+        if (arg instanceof Error) {
+          const {message, stack} = arg;
+          return `Error: ${message}${stack ? ('\nStack: ' + stack) : ''}`;
+        }
+        if (typeof arg === 'object' && arg !== null) {
+          try {
+            return JSON.stringify(arg);
+          } catch (error) {
+            return '[Circular Object]';
+          }
+        } else {
+          return String(arg);
+        }
+      })
+      .join(' ');
+  }
+
+  console.log = function(...args) {
+    const logString = stringifyArgs(args);
+    window.parent.postMessage({ type: 'log', message: logString }, '*');
+    originalConsoleLog.apply(console, args);
+  };
+
+  console.error = function(...args) {
+    let errorData;
+    if (args.length > 0 && args[0] instanceof Error) {
+      const err = args[0];
+      // If the first arg is an Error, capture its details.
+      errorData = {
+        type: 'error',
+        source: 'CONSOLE_ERROR',
+        ...getErrorObject(err),
+        rawArgsString: stringifyArgs(args.slice(1)),
+        timestamp: new Date().toISOString(),
+      };
+    } else {
+      // If not an Error object, treat all args as a general error message.
+      errorData = {
+        type: 'error',
+        source: 'CONSOLE_ERROR',
+        message: stringifyArgs(args),
+        name: 'ConsoleLoggedError',
+        stack: null,
+        timestamp: new Date().toISOString(),
+      };
+    }
+    window.parent.postMessage(errorData, '*');
+    originalConsoleError.apply(console, args);
+  };
+
+  // Listen for global unhandled synchronous errors.
+  window.addEventListener('error', function(event) {
+    const errorDetails = event.error ? getErrorObject(event.error) : {
+      message: event.message,
+      name: 'GlobalError',
+      stack: null,
+      filename: event.filename,
+      lineno: event.lineno,
+      colno: event.colno,
+    };
+
+    window.parent.postMessage({
+      type: 'error',
+      source: 'global',
+      ...errorDetails,
+      message: errorDetails.message || event.message,
+      timestamp: new Date().toISOString(),
+    }, '*');
+  });
+
+  // Listen for unhandled promise rejections (asynchronous errors).
+  window.addEventListener('unhandledrejection', function(event) {
+    const errorDetails = getErrorObject(event.reason);
+
+    window.parent.postMessage({
+      type: 'error',
+      source: 'unhandledrejection',
+      ...errorDetails,
+      message: errorDetails.message || 'Unhandled Promise Rejection',
+      timestamp: new Date().toISOString(),
+    }, '*');
+  });
+
+})();</script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SongCraft - Editor de Cifrados y Cancionero</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&amp;family=Inter:wght@400;500;600;700;800&amp;family=Lora:ital,wght@0,500;0,600;1,400&amp;display=swap" rel="stylesheet">
+
+  <style>
+    body {
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    }
+    .font-serif-song {
+      font-family: 'Lora', Georgia, serif;
+    }
+    .font-mono-code {
+      font-family: 'Fira Code', monospace;
+    }
+
+    /* Interlinear Chord Rendering */
+    .chord-pair {
+      display: inline-flex;
+      flex-direction: column;
+      vertical-align: bottom;
+      position: relative;
+      margin-right: 0.04em;
+    }
+
+    .chord-badge {
+      font-family: 'Inter', system-ui, sans-serif;
+      font-weight: 700;
+      line-height: 1.15;
+      height: 1.25em;
+      white-space: pre;
+      user-select: text;
+    }
+
+    .lyric-text {
+      line-height: 1.35;
+      white-space: pre;
+    }
+
+    .song-line {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: flex-end;
+      min-height: 2.25em;
+      margin-bottom: 0.35rem;
+    }
+
+    .verse-block {
+      page-break-inside: avoid;
+      break-inside: avoid;
+      margin-bottom: 1.2rem;
+    }
+
+    /* Multi-column layouts */
+    .song-columns-2 {
+      column-count: 2;
+      column-gap: 2.5rem;
+    }
+
+    /* Print Styles for PDF Export */
+    @media print {
+      @page {
+        size: letter portrait;
+        margin: 1.5cm 1.2cm 1.5cm 1.2cm;
+      }
+      body {
+        background: #ffffff !important;
+        color: #000000 !important;
+        padding: 0 !important;
+        margin: 0 !important;
+      }
+      .no-print {
+        display: none !important;
+      }
+      .print-area {
+        display: block !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        background: transparent !important;
+        box-shadow: none !important;
+        border: none !important;
+      }
+      .song-page-break {
+        page-break-after: always;
+        break-after: page;
+      }
+      .song-page-break:last-child {
+        page-break-after: auto;
+        break-after: auto;
+      }
+      .toc-page {
+        page-break-after: always;
+        break-after: page;
+      }
+      .song-line {
+        page-break-inside: avoid;
+        break-inside: avoid;
+      }
+      .verse-block {
+        page-break-inside: avoid;
+        break-inside: avoid;
+      }
+    }
+  </style>
+<style>*, ::before, ::after{--tw-border-spacing-x:0;--tw-border-spacing-y:0;--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-pan-x: ;--tw-pan-y: ;--tw-pinch-zoom: ;--tw-scroll-snap-strictness:proximity;--tw-gradient-from-position: ;--tw-gradient-via-position: ;--tw-gradient-to-position: ;--tw-ordinal: ;--tw-slashed-zero: ;--tw-numeric-figure: ;--tw-numeric-spacing: ;--tw-numeric-fraction: ;--tw-ring-inset: ;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:rgb(59 130 246 / 0.5);--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;--tw-blur: ;--tw-brightness: ;--tw-contrast: ;--tw-grayscale: ;--tw-hue-rotate: ;--tw-invert: ;--tw-saturate: ;--tw-sepia: ;--tw-drop-shadow: ;--tw-backdrop-blur: ;--tw-backdrop-brightness: ;--tw-backdrop-contrast: ;--tw-backdrop-grayscale: ;--tw-backdrop-hue-rotate: ;--tw-backdrop-invert: ;--tw-backdrop-opacity: ;--tw-backdrop-saturate: ;--tw-backdrop-sepia: ;--tw-contain-size: ;--tw-contain-layout: ;--tw-contain-paint: ;--tw-contain-style: }::backdrop{--tw-border-spacing-x:0;--tw-border-spacing-y:0;--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-pan-x: ;--tw-pan-y: ;--tw-pinch-zoom: ;--tw-scroll-snap-strictness:proximity;--tw-gradient-from-position: ;--tw-gradient-via-position: ;--tw-gradient-to-position: ;--tw-ordinal: ;--tw-slashed-zero: ;--tw-numeric-figure: ;--tw-numeric-spacing: ;--tw-numeric-fraction: ;--tw-ring-inset: ;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:rgb(59 130 246 / 0.5);--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;--tw-blur: ;--tw-brightness: ;--tw-contrast: ;--tw-grayscale: ;--tw-hue-rotate: ;--tw-invert: ;--tw-saturate: ;--tw-sepia: ;--tw-drop-shadow: ;--tw-backdrop-blur: ;--tw-backdrop-brightness: ;--tw-backdrop-contrast: ;--tw-backdrop-grayscale: ;--tw-backdrop-hue-rotate: ;--tw-backdrop-invert: ;--tw-backdrop-opacity: ;--tw-backdrop-saturate: ;--tw-backdrop-sepia: ;--tw-contain-size: ;--tw-contain-layout: ;--tw-contain-paint: ;--tw-contain-style: }/* ! tailwindcss v3.4.17 | MIT License | https://tailwindcss.com */*,::after,::before{box-sizing:border-box;border-width:0;border-style:solid;border-color:#e5e7eb}::after,::before{--tw-content:''}:host,html{line-height:1.5;-webkit-text-size-adjust:100%;-moz-tab-size:4;tab-size:4;font-family:ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";font-feature-settings:normal;font-variation-settings:normal;-webkit-tap-highlight-color:transparent}body{margin:0;line-height:inherit}hr{height:0;color:inherit;border-top-width:1px}abbr:where([title]){-webkit-text-decoration:underline dotted;text-decoration:underline dotted}h1,h2,h3,h4,h5,h6{font-size:inherit;font-weight:inherit}a{color:inherit;text-decoration:inherit}b,strong{font-weight:bolder}code,kbd,pre,samp{font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;font-feature-settings:normal;font-variation-settings:normal;font-size:1em}small{font-size:80%}sub,sup{font-size:75%;line-height:0;position:relative;vertical-align:baseline}sub{bottom:-.25em}sup{top:-.5em}table{text-indent:0;border-color:inherit;border-collapse:collapse}button,input,optgroup,select,textarea{font-family:inherit;font-feature-settings:inherit;font-variation-settings:inherit;font-size:100%;font-weight:inherit;line-height:inherit;letter-spacing:inherit;color:inherit;margin:0;padding:0}button,select{text-transform:none}button,input:where([type=button]),input:where([type=reset]),input:where([type=submit]){-webkit-appearance:button;background-color:transparent;background-image:none}:-moz-focusring{outline:auto}:-moz-ui-invalid{box-shadow:none}progress{vertical-align:baseline}::-webkit-inner-spin-button,::-webkit-outer-spin-button{height:auto}[type=search]{-webkit-appearance:textfield;outline-offset:-2px}::-webkit-search-decoration{-webkit-appearance:none}::-webkit-file-upload-button{-webkit-appearance:button;font:inherit}summary{display:list-item}blockquote,dd,dl,figure,h1,h2,h3,h4,h5,h6,hr,p,pre{margin:0}fieldset{margin:0;padding:0}legend{padding:0}menu,ol,ul{list-style:none;margin:0;padding:0}dialog{padding:0}textarea{resize:vertical}input::placeholder,textarea::placeholder{opacity:1;color:#9ca3af}[role=button],button{cursor:pointer}:disabled{cursor:default}audio,canvas,embed,iframe,img,object,svg,video{display:block;vertical-align:middle}img,video{max-width:100%;height:auto}[hidden]:where(:not([hidden=until-found])){display:none}.pointer-events-none{pointer-events:none}.fixed{position:fixed}.absolute{position:absolute}.relative{position:relative}.sticky{position:sticky}.inset-0{inset:0px}.bottom-6{bottom:1.5rem}.left-2\.5{left:0.625rem}.right-6{right:1.5rem}.top-0{top:0px}.top-2\.5{top:0.625rem}.top-20{top:5rem}.z-40{z-index:40}.z-50{z-index:50}.mx-auto{margin-left:auto;margin-right:auto}.mb-0\.5{margin-bottom:0.125rem}.mb-1{margin-bottom:0.25rem}.mb-4{margin-bottom:1rem}.ml-1{margin-left:0.25rem}.mb-10{margin-bottom:2.5rem}.mb-6{margin-bottom:1.5rem}.mt-1{margin-top:0.25rem}.mt-2\.5{margin-top:0.625rem}.block{display:block}.flex{display:flex}.inline-flex{display:inline-flex}.grid{display:grid}.hidden{display:none}.h-3\.5{height:0.875rem}.h-4{height:1rem}.h-5{height:1.25rem}.h-6{height:1.5rem}.h-\[calc\(100vh-6rem\)\]{height:calc(100vh - 6rem)}.min-h-\[600px\]{min-height:600px}.min-h-screen{min-height:100vh}.w-3\.5{width:0.875rem}.w-4{width:1rem}.w-5{width:1.25rem}.w-6{width:1.5rem}.w-full{width:100%}.min-w-0{min-width:0px}.max-w-7xl{max-width:80rem}.max-w-lg{max-width:32rem}.max-w-xl{max-width:36rem}.flex-1{flex:1 1 0%}.cursor-pointer{cursor:pointer}.select-none{-webkit-user-select:none;user-select:none}.resize-none{resize:none}.list-inside{list-style-position:inside}.list-decimal{list-style-type:decimal}.list-disc{list-style-type:disc}.grid-cols-1{grid-template-columns:repeat(1, minmax(0, 1fr))}.grid-cols-2{grid-template-columns:repeat(2, minmax(0, 1fr))}.flex-col{flex-direction:column}.flex-wrap{flex-wrap:wrap}.items-end{align-items:flex-end}.items-center{align-items:center}.justify-end{justify-content:flex-end}.justify-center{justify-content:center}.justify-between{justify-content:space-between}.gap-0\.5{gap:0.125rem}.gap-1{gap:0.25rem}.gap-1\.5{gap:0.375rem}.gap-2{gap:0.5rem}.gap-2\.5{gap:0.625rem}.gap-3{gap:0.75rem}.gap-4{gap:1rem}.gap-5{gap:1.25rem}.space-x-3 > :not([hidden]) ~ :not([hidden]){--tw-space-x-reverse:0;margin-right:calc(0.75rem * var(--tw-space-x-reverse));margin-left:calc(0.75rem * calc(1 - var(--tw-space-x-reverse)))}.space-y-1 > :not([hidden]) ~ :not([hidden]){--tw-space-y-reverse:0;margin-top:calc(0.25rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(0.25rem * var(--tw-space-y-reverse))}.space-y-2 > :not([hidden]) ~ :not([hidden]){--tw-space-y-reverse:0;margin-top:calc(0.5rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(0.5rem * var(--tw-space-y-reverse))}.space-y-2\.5 > :not([hidden]) ~ :not([hidden]){--tw-space-y-reverse:0;margin-top:calc(0.625rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(0.625rem * var(--tw-space-y-reverse))}.space-y-3 > :not([hidden]) ~ :not([hidden]){--tw-space-y-reverse:0;margin-top:calc(0.75rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(0.75rem * var(--tw-space-y-reverse))}.space-y-4 > :not([hidden]) ~ :not([hidden]){--tw-space-y-reverse:0;margin-top:calc(1rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(1rem * var(--tw-space-y-reverse))}.divide-y > :not([hidden]) ~ :not([hidden]){--tw-divide-y-reverse:0;border-top-width:calc(1px * calc(1 - var(--tw-divide-y-reverse)));border-bottom-width:calc(1px * var(--tw-divide-y-reverse))}.divide-slate-100 > :not([hidden]) ~ :not([hidden]){--tw-divide-opacity:1;border-color:rgb(241 245 249 / var(--tw-divide-opacity, 1))}.overflow-hidden{overflow:hidden}.overflow-x-auto{overflow-x:auto}.overflow-y-auto{overflow-y:auto}.truncate{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.rounded{border-radius:0.25rem}.rounded-2xl{border-radius:1rem}.rounded-full{border-radius:9999px}.rounded-lg{border-radius:0.5rem}.rounded-xl{border-radius:0.75rem}.border{border-width:1px}.border-b{border-bottom-width:1px}.border-t{border-top-width:1px}.border-b-2{border-bottom-width:2px}.border-emerald-200{--tw-border-opacity:1;border-color:rgb(167 243 208 / var(--tw-border-opacity, 1))}.border-indigo-200{--tw-border-opacity:1;border-color:rgb(199 210 254 / var(--tw-border-opacity, 1))}.border-indigo-500\/30{border-color:rgb(99 102 241 / 0.3)}.border-slate-100{--tw-border-opacity:1;border-color:rgb(241 245 249 / var(--tw-border-opacity, 1))}.border-slate-200{--tw-border-opacity:1;border-color:rgb(226 232 240 / var(--tw-border-opacity, 1))}.border-slate-700{--tw-border-opacity:1;border-color:rgb(51 65 85 / var(--tw-border-opacity, 1))}.border-slate-800{--tw-border-opacity:1;border-color:rgb(30 41 59 / var(--tw-border-opacity, 1))}.border-slate-900{--tw-border-opacity:1;border-color:rgb(15 23 42 / var(--tw-border-opacity, 1))}.bg-emerald-50{--tw-bg-opacity:1;background-color:rgb(236 253 245 / var(--tw-bg-opacity, 1))}.bg-indigo-50{--tw-bg-opacity:1;background-color:rgb(238 242 255 / var(--tw-bg-opacity, 1))}.bg-indigo-500\/20{background-color:rgb(99 102 241 / 0.2)}.bg-indigo-600{--tw-bg-opacity:1;background-color:rgb(79 70 229 / var(--tw-bg-opacity, 1))}.bg-slate-100{--tw-bg-opacity:1;background-color:rgb(241 245 249 / var(--tw-bg-opacity, 1))}.bg-slate-50{--tw-bg-opacity:1;background-color:rgb(248 250 252 / var(--tw-bg-opacity, 1))}.bg-slate-50\/50{background-color:rgb(248 250 252 / 0.5)}.bg-slate-800{--tw-bg-opacity:1;background-color:rgb(30 41 59 / var(--tw-bg-opacity, 1))}.bg-slate-900{--tw-bg-opacity:1;background-color:rgb(15 23 42 / var(--tw-bg-opacity, 1))}.bg-slate-900\/60{background-color:rgb(15 23 42 / 0.6)}.bg-white{--tw-bg-opacity:1;background-color:rgb(255 255 255 / var(--tw-bg-opacity, 1))}.bg-indigo-50\/80{background-color:rgb(238 242 255 / 0.8)}.bg-slate-200\/80{background-color:rgb(226 232 240 / 0.8)}.p-0\.5{padding:0.125rem}.p-1{padding:0.25rem}.p-1\.5{padding:0.375rem}.p-2{padding:0.5rem}.p-2\.5{padding:0.625rem}.p-3{padding:0.75rem}.p-3\.5{padding:0.875rem}.p-4{padding:1rem}.p-6{padding:1.5rem}.p-8{padding:2rem}.px-1{padding-left:0.25rem;padding-right:0.25rem}.px-1\.5{padding-left:0.375rem;padding-right:0.375rem}.px-2{padding-left:0.5rem;padding-right:0.5rem}.px-2\.5{padding-left:0.625rem;padding-right:0.625rem}.px-3{padding-left:0.75rem;padding-right:0.75rem}.px-4{padding-left:1rem;padding-right:1rem}.py-0\.5{padding-top:0.125rem;padding-bottom:0.125rem}.py-1{padding-top:0.25rem;padding-bottom:0.25rem}.py-1\.5{padding-top:0.375rem;padding-bottom:0.375rem}.py-2{padding-top:0.5rem;padding-bottom:0.5rem}.py-3{padding-top:0.75rem;padding-bottom:0.75rem}.pb-3{padding-bottom:0.75rem}.pl-8{padding-left:2rem}.pr-3{padding-right:0.75rem}.pt-1{padding-top:0.25rem}.pt-2{padding-top:0.5rem}.font-mono{font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace}.text-\[10px\]{font-size:10px}.text-\[11px\]{font-size:11px}.text-base{font-size:1rem;line-height:1.5rem}.text-sm{font-size:0.875rem;line-height:1.25rem}.text-xs{font-size:0.75rem;line-height:1rem}.text-2xl{font-size:1.5rem;line-height:2rem}.font-bold{font-weight:700}.font-extrabold{font-weight:800}.font-medium{font-weight:500}.font-semibold{font-weight:600}.uppercase{text-transform:uppercase}.leading-relaxed{line-height:1.625}.leading-tight{line-height:1.25}.tracking-tight{letter-spacing:-0.025em}.tracking-wider{letter-spacing:0.05em}.text-emerald-400{--tw-text-opacity:1;color:rgb(52 211 153 / var(--tw-text-opacity, 1))}.text-emerald-800{--tw-text-opacity:1;color:rgb(6 95 70 / var(--tw-text-opacity, 1))}.text-indigo-300{--tw-text-opacity:1;color:rgb(165 180 252 / var(--tw-text-opacity, 1))}.text-indigo-400{--tw-text-opacity:1;color:rgb(129 140 248 / var(--tw-text-opacity, 1))}.text-indigo-600{--tw-text-opacity:1;color:rgb(79 70 229 / var(--tw-text-opacity, 1))}.text-indigo-700{--tw-text-opacity:1;color:rgb(67 56 202 / var(--tw-text-opacity, 1))}.text-rose-600{--tw-text-opacity:1;color:rgb(225 29 72 / var(--tw-text-opacity, 1))}.text-slate-300{--tw-text-opacity:1;color:rgb(203 213 225 / var(--tw-text-opacity, 1))}.text-slate-400{--tw-text-opacity:1;color:rgb(148 163 184 / var(--tw-text-opacity, 1))}.text-slate-500{--tw-text-opacity:1;color:rgb(100 116 139 / var(--tw-text-opacity, 1))}.text-slate-600{--tw-text-opacity:1;color:rgb(71 85 105 / var(--tw-text-opacity, 1))}.text-slate-700{--tw-text-opacity:1;color:rgb(51 65 85 / var(--tw-text-opacity, 1))}.text-slate-800{--tw-text-opacity:1;color:rgb(30 41 59 / var(--tw-text-opacity, 1))}.text-slate-900{--tw-text-opacity:1;color:rgb(15 23 42 / var(--tw-text-opacity, 1))}.text-white{--tw-text-opacity:1;color:rgb(255 255 255 / var(--tw-text-opacity, 1))}.text-blue-700{--tw-text-opacity:1;color:rgb(29 78 216 / var(--tw-text-opacity, 1))}.text-indigo-950{--tw-text-opacity:1;color:rgb(30 27 75 / var(--tw-text-opacity, 1))}.underline{-webkit-text-decoration-line:underline;text-decoration-line:underline}.antialiased{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}.opacity-0{opacity:0}.shadow-2xl{--tw-shadow:0 25px 50px -12px rgb(0 0 0 / 0.25);--tw-shadow-colored:0 25px 50px -12px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.shadow-inner{--tw-shadow:inset 0 2px 4px 0 rgb(0 0 0 / 0.05);--tw-shadow-colored:inset 0 2px 4px 0 var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.shadow-md{--tw-shadow:0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);--tw-shadow-colored:0 4px 6px -1px var(--tw-shadow-color), 0 2px 4px -2px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.shadow-sm{--tw-shadow:0 1px 2px 0 rgb(0 0 0 / 0.05);--tw-shadow-colored:0 1px 2px 0 var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.shadow-indigo-600\/30{--tw-shadow-color:rgb(79 70 229 / 0.3);--tw-shadow:var(--tw-shadow-colored)}.transition{transition-property:color, background-color, border-color, fill, stroke, opacity, box-shadow, transform, filter, -webkit-text-decoration-color, -webkit-backdrop-filter;transition-property:color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter;transition-property:color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter, -webkit-text-decoration-color, -webkit-backdrop-filter;transition-timing-function:cubic-bezier(0.4, 0, 0.2, 1);transition-duration:150ms}.transition-opacity{transition-property:opacity;transition-timing-function:cubic-bezier(0.4, 0, 0.2, 1);transition-duration:150ms}.duration-300{transition-duration:300ms}.hover\:bg-indigo-100:hover{--tw-bg-opacity:1;background-color:rgb(224 231 255 / var(--tw-bg-opacity, 1))}.hover\:bg-indigo-50:hover{--tw-bg-opacity:1;background-color:rgb(238 242 255 / var(--tw-bg-opacity, 1))}.hover\:bg-indigo-500:hover{--tw-bg-opacity:1;background-color:rgb(99 102 241 / var(--tw-bg-opacity, 1))}.hover\:bg-indigo-700:hover{--tw-bg-opacity:1;background-color:rgb(67 56 202 / var(--tw-bg-opacity, 1))}.hover\:bg-rose-50:hover{--tw-bg-opacity:1;background-color:rgb(255 241 242 / var(--tw-bg-opacity, 1))}.hover\:bg-slate-200:hover{--tw-bg-opacity:1;background-color:rgb(226 232 240 / var(--tw-bg-opacity, 1))}.hover\:bg-slate-50:hover{--tw-bg-opacity:1;background-color:rgb(248 250 252 / var(--tw-bg-opacity, 1))}.hover\:bg-slate-700:hover{--tw-bg-opacity:1;background-color:rgb(51 65 85 / var(--tw-bg-opacity, 1))}.hover\:bg-slate-800:hover{--tw-bg-opacity:1;background-color:rgb(30 41 59 / var(--tw-bg-opacity, 1))}.hover\:bg-white:hover{--tw-bg-opacity:1;background-color:rgb(255 255 255 / var(--tw-bg-opacity, 1))}.hover\:text-indigo-600:hover{--tw-text-opacity:1;color:rgb(79 70 229 / var(--tw-text-opacity, 1))}.hover\:text-indigo-700:hover{--tw-text-opacity:1;color:rgb(67 56 202 / var(--tw-text-opacity, 1))}.hover\:text-rose-600:hover{--tw-text-opacity:1;color:rgb(225 29 72 / var(--tw-text-opacity, 1))}.hover\:text-rose-700:hover{--tw-text-opacity:1;color:rgb(190 18 60 / var(--tw-text-opacity, 1))}.hover\:text-slate-600:hover{--tw-text-opacity:1;color:rgb(71 85 105 / var(--tw-text-opacity, 1))}.hover\:text-slate-700:hover{--tw-text-opacity:1;color:rgb(51 65 85 / var(--tw-text-opacity, 1))}.hover\:text-slate-900:hover{--tw-text-opacity:1;color:rgb(15 23 42 / var(--tw-text-opacity, 1))}.hover\:text-white:hover{--tw-text-opacity:1;color:rgb(255 255 255 / var(--tw-text-opacity, 1))}.focus\:outline-none:focus{outline:2px solid transparent;outline-offset:2px}.focus\:ring-0:focus{--tw-ring-offset-shadow:var(--tw-ring-inset) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color);--tw-ring-shadow:var(--tw-ring-inset) 0 0 0 calc(0px + var(--tw-ring-offset-width)) var(--tw-ring-color);box-shadow:var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow, 0 0 #0000)}.focus\:ring-2:focus{--tw-ring-offset-shadow:var(--tw-ring-inset) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color);--tw-ring-shadow:var(--tw-ring-inset) 0 0 0 calc(2px + var(--tw-ring-offset-width)) var(--tw-ring-color);box-shadow:var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow, 0 0 #0000)}.focus\:ring-indigo-500:focus{--tw-ring-opacity:1;--tw-ring-color:rgb(99 102 241 / var(--tw-ring-opacity, 1))}@media (min-width: 640px){.sm\:block{display:block}.sm\:inline{display:inline}.sm\:p-12{padding:3rem}.sm\:p-5{padding:1.25rem}.sm\:px-3{padding-left:0.75rem;padding-right:0.75rem}.sm\:px-6{padding-left:1.5rem;padding-right:1.5rem}.sm\:py-1\.5{padding-top:0.375rem;padding-bottom:0.375rem}.sm\:text-3xl{font-size:1.875rem;line-height:2.25rem}}@media (min-width: 768px){.md\:inline{display:inline}}@media (min-width: 1024px){.lg\:col-span-3{grid-column:span 3 / span 3}.lg\:col-span-4{grid-column:span 4 / span 4}.lg\:col-span-5{grid-column:span 5 / span 5}.lg\:grid-cols-12{grid-template-columns:repeat(12, minmax(0, 1fr))}}</style></head>
+<body class="bg-slate-100 text-slate-800 antialiased min-h-screen flex flex-col">
+
+  <!-- Main Navigation Bar -->
+  <header class="no-print bg-slate-900 text-white border-b border-slate-800 sticky top-0 z-40 shadow-sm">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between gap-4">
+      
+      <!-- Brand & Status -->
+      <div class="flex items-center space-x-3">
+        <div class="bg-indigo-600 text-white p-2 rounded-xl shadow-md flex items-center justify-center">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"></path>
+          </svg>
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <h1 class="text-base font-extrabold tracking-tight text-white">SongCraft</h1>
+            <span class="text-[11px] font-semibold bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 px-2 py-0.5 rounded-full">Cancionero &amp; PDF</span>
+          </div>
+          <p class="text-[11px] text-slate-400 hidden sm:block">Editor de acordes y compilador de repertorios</p>
+        </div>
+      </div>
+
+      <!-- Action buttons -->
+      <div class="flex items-center gap-2">
+        <button id="btnOpenGithubGuide" class="px-3 py-1.5 rounded-lg text-xs font-medium text-slate-300 hover:text-white bg-slate-800 hover:bg-slate-700 border border-slate-700 transition flex items-center gap-1.5">
+          <svg class="w-4 h-4 text-slate-400" fill="currentColor" viewBox="0 0 24 24"><path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"></path></svg>
+          <span class="hidden md:inline">Publicar en</span> GitHub
+        </button>
+
+        <button id="btnOpenSyntaxHelp" class="p-2 sm:px-3 sm:py-1.5 rounded-lg text-xs font-medium text-slate-300 hover:text-white bg-slate-800 hover:bg-slate-700 border border-slate-700 transition flex items-center gap-1.5" title="Ayuda de formato">
+          <svg class="w-4 h-4 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+          <span class="hidden sm:inline">Guía Formato</span>
+        </button>
+
+        <button id="btnExportPDF" class="px-4 py-2 rounded-xl text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-500 shadow-md shadow-indigo-600/30 transition flex items-center gap-1.5">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
+          <span>Exportar a PDF</span>
+        </button>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- Notification Toast -->
+  <div id="toast" class="no-print fixed bottom-6 right-6 z-50 bg-slate-900 text-white px-4 py-3 rounded-xl shadow-2xl border border-slate-700 text-xs font-semibold opacity-0 transition-opacity duration-300 pointer-events-none flex items-center gap-2">
+    <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+    <span id="toastMsg">Mensaje</span>
+  </div>
+
+  <!-- App Body Layout (3 Columns on Desktop) -->
+  <div class="flex-1 max-w-7xl w-full mx-auto p-3 sm:p-5 grid grid-cols-1 lg:grid-cols-12 gap-5">
+
+    <!-- COLUMN 1: Song Library & Setlist Selection (3 Cols) -->
+    <aside class="no-print lg:col-span-3 flex flex-col bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden h-[calc(100vh-6rem)] sticky top-20">
+      
+      <!-- Library Top Actions -->
+      <div class="p-3.5 bg-slate-50 border-b border-slate-200 flex flex-col gap-2.5">
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-bold text-slate-800 uppercase tracking-wider flex items-center gap-1.5">
+            <svg class="w-4 h-4 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+            Mi Repertorio (<span id="songCount">3</span>)
+          </span>
+          <button id="btnNewSong" class="px-2.5 py-1 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-semibold shadow-xs transition flex items-center gap-1">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+            Nueva
+          </button>
+        </div>
+
+        <!-- Search Bar -->
+        <div class="relative">
+          <input id="searchInput" type="text" placeholder="Buscar por título, autor o tono..." class="w-full text-xs pl-8 pr-3 py-2 bg-white border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+          <svg class="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+        </div>
+
+        <!-- Multi-select Bar for Songbook Compile -->
+        <div class="flex items-center justify-between text-[11px] pt-1">
+          <label class="flex items-center gap-1.5 text-slate-600 cursor-pointer select-none">
+            <input id="checkSelectAll" type="checkbox" class="rounded text-indigo-600 focus:ring-0">
+            <span>Seleccionar todas</span>
+          </label>
+          <span id="selectedCountBadge" class="font-semibold text-indigo-600">3 sel.</span>
+        </div>
+      </div>
+
+      <!-- Song List Scrollable Area -->
+      <div id="songListContainer" class="flex-1 overflow-y-auto divide-y divide-slate-100 p-1">
+          <div class="group flex items-center gap-2.5 p-2.5 rounded-xl transition cursor-pointer bg-indigo-50/80 border border-indigo-200" onclick="selectActiveSong('song-1')">
+            <!-- Selection Checkbox -->
+            <input type="checkbox" checked="" class="rounded text-indigo-600 focus:ring-0 cursor-pointer" onclick="event.stopPropagation(); toggleSongSelection('song-1')">
+            
+            <!-- Song Meta -->
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center justify-between">
+                <h4 class="text-xs font-bold truncate text-indigo-950">Los hijos de Sión</h4>
+                <span class="text-[10px] font-mono font-bold bg-slate-200/80 text-slate-700 px-1 rounded">C</span>
+              </div>
+              <p class="text-[11px] text-slate-400 truncate">Tradicional / Alabanza</p>
+            </div>
+          </div>
+        
+          <div class="group flex items-center gap-2.5 p-2.5 rounded-xl transition cursor-pointer hover:bg-slate-50" onclick="selectActiveSong('song-2')">
+            <!-- Selection Checkbox -->
+            <input type="checkbox" checked="" class="rounded text-indigo-600 focus:ring-0 cursor-pointer" onclick="event.stopPropagation(); toggleSongSelection('song-2')">
+            
+            <!-- Song Meta -->
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center justify-between">
+                <h4 class="text-xs font-bold truncate text-slate-800">No hay Dios que pueda hacer las obras</h4>
+                <span class="text-[10px] font-mono font-bold bg-slate-200/80 text-slate-700 px-1 rounded">D</span>
+              </div>
+              <p class="text-[11px] text-slate-400 truncate">Inspiración</p>
+            </div>
+          </div>
+        
+          <div class="group flex items-center gap-2.5 p-2.5 rounded-xl transition cursor-pointer hover:bg-slate-50" onclick="selectActiveSong('song-3')">
+            <!-- Selection Checkbox -->
+            <input type="checkbox" checked="" class="rounded text-indigo-600 focus:ring-0 cursor-pointer" onclick="event.stopPropagation(); toggleSongSelection('song-3')">
+            
+            <!-- Song Meta -->
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center justify-between">
+                <h4 class="text-xs font-bold truncate text-slate-800">Tu Fidelidad</h4>
+                <span class="text-[10px] font-mono font-bold bg-slate-200/80 text-slate-700 px-1 rounded">D</span>
+              </div>
+              <p class="text-[11px] text-slate-400 truncate">Marcos Witt</p>
+            </div>
+          </div>
+        </div>
+
+      <!-- Library Footer & Backup JSON -->
+      <div class="p-2.5 bg-slate-50 border-t border-slate-200 flex items-center justify-between text-xs text-slate-500">
+        <div class="flex gap-2">
+          <button id="btnExportJSON" class="hover:text-indigo-600 transition" title="Exportar respaldo JSON">Exportar JSON</button>
+          <span>•</span>
+          <label class="hover:text-indigo-600 cursor-pointer transition" title="Restaurar canciones de archivo JSON">
+            Importar
+            <input id="importJSONFile" type="file" accept=".json" class="hidden">
+          </label>
+        </div>
+        <button id="btnResetSamples" class="text-[11px] text-slate-400 hover:text-rose-600 transition" title="Restablecer ejemplos originales">Muestras</button>
+      </div>
+
+    </aside>
+
+    <!-- COLUMN 2: Real-time ChordPro Editor (4 Cols) -->
+    <section class="no-print lg:col-span-4 flex flex-col bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden h-[calc(100vh-6rem)] sticky top-20">
+      
+      <!-- Editor Header -->
+      <div class="px-4 py-3 bg-slate-50 border-b border-slate-200 flex items-center justify-between gap-2">
+        <span class="text-xs font-bold text-slate-800 uppercase tracking-wider flex items-center gap-1.5">
+          <svg class="w-4 h-4 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+          Editar Canción
+        </span>
+
+        <!-- Quick chord insertion toolbar -->
+        <div class="flex items-center gap-1 overflow-x-auto py-0.5">
+          <button type="button" onclick="insertChord('[C]')" class="text-xs bg-white hover:bg-indigo-50 text-indigo-700 border border-slate-200 px-1.5 py-0.5 rounded font-semibold transition">C</button>
+          <button type="button" onclick="insertChord('[D]')" class="text-xs bg-white hover:bg-indigo-50 text-indigo-700 border border-slate-200 px-1.5 py-0.5 rounded font-semibold transition">D</button>
+          <button type="button" onclick="insertChord('[E]')" class="text-xs bg-white hover:bg-indigo-50 text-indigo-700 border border-slate-200 px-1.5 py-0.5 rounded font-semibold transition">E</button>
+          <button type="button" onclick="insertChord('[F]')" class="text-xs bg-white hover:bg-indigo-50 text-indigo-700 border border-slate-200 px-1.5 py-0.5 rounded font-semibold transition">F</button>
+          <button type="button" onclick="insertChord('[G]')" class="text-xs bg-white hover:bg-indigo-50 text-indigo-700 border border-slate-200 px-1.5 py-0.5 rounded font-semibold transition">G</button>
+          <button type="button" onclick="insertChord('[A]')" class="text-xs bg-white hover:bg-indigo-50 text-indigo-700 border border-slate-200 px-1.5 py-0.5 rounded font-semibold transition">A</button>
+          <button type="button" onclick="insertChord('[B]')" class="text-xs bg-white hover:bg-indigo-50 text-indigo-700 border border-slate-200 px-1.5 py-0.5 rounded font-semibold transition">B</button>
+          <button type="button" onclick="insertChord('[Am]')" class="text-xs bg-white hover:bg-indigo-50 text-indigo-700 border border-slate-200 px-1.5 py-0.5 rounded font-semibold transition">Am</button>
+        </div>
+      </div>
+
+      <!-- Song Metadata Inputs -->
+      <div class="p-3.5 space-y-2.5 border-b border-slate-100 bg-white">
+        <div>
+          <label class="block text-[11px] font-bold text-slate-500 mb-0.5 uppercase tracking-wider">Título de la canción</label>
+          <input id="editTitle" type="text" class="w-full text-sm font-bold px-3 py-1.5 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="Ej: Tu Fidelidad">
+        </div>
+
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label class="block text-[11px] font-bold text-slate-500 mb-0.5 uppercase tracking-wider">Tono / Clave</label>
+            <input id="editKey" type="text" class="w-full text-xs px-2.5 py-1.5 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="Ej: C Mayor, Em">
+          </div>
+          <div>
+            <label class="block text-[11px] font-bold text-slate-500 mb-0.5 uppercase tracking-wider">Autor / Artista</label>
+            <input id="editArtist" type="text" class="w-full text-xs px-2.5 py-1.5 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="Ej: Marcos Witt">
+          </div>
+        </div>
+      </div>
+
+      <!-- ChordPro Textarea -->
+      <div class="flex-1 p-3 flex flex-col bg-slate-50/50">
+        <div class="flex items-center justify-between mb-1">
+          <label class="text-[11px] font-semibold text-slate-500">Cuerpo en formato ChordPro [Acorde]Letra:</label>
+          <span class="text-[10px] text-slate-400">Guarda automáticamente</span>
+        </div>
+        <textarea id="editBody" class="w-full flex-1 p-3 text-xs font-mono-code leading-relaxed bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:outline-none resize-none shadow-inner" spellcheck="false" placeholder="//[C]No hay Dios que pueda hacer las [G]obras..."></textarea>
+      </div>
+
+      <!-- Delete / Duplicate Actions -->
+      <div class="p-2.5 bg-slate-50 border-t border-slate-200 flex items-center justify-between">
+        <button id="btnDuplicateSong" class="px-2.5 py-1 text-xs text-slate-600 hover:text-indigo-700 hover:bg-slate-200 rounded-lg transition flex items-center gap-1 font-medium">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+          Duplicar
+        </button>
+        <button id="btnDeleteSong" class="px-2.5 py-1 text-xs text-rose-600 hover:text-rose-700 hover:bg-rose-50 rounded-lg transition flex items-center gap-1 font-medium">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+          Eliminar
+        </button>
+      </div>
+
+    </section>
+
+    <!-- COLUMN 3: Live Preview & Document Compiler (5 Cols) -->
+    <section class="lg:col-span-5 flex flex-col">
+      
+      <!-- Preview & Export Toolbar -->
+      <div class="no-print bg-white p-3 rounded-2xl shadow-sm border border-slate-200 mb-4 flex flex-wrap items-center justify-between gap-3 text-xs">
+        
+        <!-- View Mode: Single vs Songbook -->
+        <div class="inline-flex rounded-xl bg-slate-100 p-1 border border-slate-200">
+          <button id="modeSingleBtn" class="px-3 py-1 rounded-lg font-semibold transition bg-white shadow-xs text-indigo-700">Canción Activa</button>
+          <button id="modeBookBtn" class="px-3 py-1 rounded-lg font-semibold transition text-slate-600 hover:text-slate-900">
+            Cancionero (<span id="modeBookCount">3</span>)
+          </button>
+        </div>
+
+        <!-- Transpose active song -->
+        <div id="transposeControls" class="flex items-center gap-1" style="display: flex;">
+          <span class="text-slate-500 font-medium">Tono:</span>
+          <div class="inline-flex rounded-lg border border-slate-200 bg-slate-50 p-0.5">
+            <button id="btnTransposeDown" class="px-2 py-0.5 font-bold hover:bg-white rounded transition">-1</button>
+            <span id="transposeDisplay" class="px-2 py-0.5 font-mono font-bold text-indigo-600 text-xs flex items-center">0</span>
+            <button id="btnTransposeUp" class="px-2 py-0.5 font-bold hover:bg-white rounded transition">+1</button>
+          </div>
+          <button id="btnTransposeReset" class="text-[11px] text-slate-400 hover:text-slate-700 ml-1 underline">0</button>
+        </div>
+
+        <!-- Sheet Display Settings -->
+        <div class="flex items-center gap-2">
+          <!-- Chord Color -->
+          <select id="selectColor" class="bg-slate-50 border border-slate-200 rounded-lg px-2 py-1 text-xs font-semibold focus:outline-none">
+            <option value="text-blue-700" selected="">Azul</option>
+            <option value="text-indigo-600">Índigo</option>
+            <option value="text-red-700">Rojo</option>
+            <option value="text-slate-900">Negro Partitura</option>
+          </select>
+
+          <!-- Columns toggle -->
+          <button id="btnToggleColumns" class="px-2.5 py-1 rounded-lg border border-slate-200 hover:bg-slate-50 font-medium text-slate-700 flex items-center gap-1" title="Alternar 1 o 2 columnas">
+            <svg class="w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 4v16m6-16v16"></path></svg>
+            <span id="columnsLabel">1 Col</span>
+          </button>
+
+          <!-- Font Size Slider -->
+          <div class="flex items-center gap-0.5">
+            <button id="btnFontDown" class="w-6 h-6 flex items-center justify-center rounded border border-slate-200 font-bold hover:bg-slate-50">-</button>
+            <button id="btnFontUp" class="w-6 h-6 flex items-center justify-center rounded border border-slate-200 font-bold hover:bg-slate-50">+</button>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Document Display (Printable Canvas Area) -->
+      <div id="printDocument" class="print-area bg-white rounded-2xl shadow-md border border-slate-200 p-8 sm:p-12 min-h-[600px] flex flex-col"><article class="song-sheet mb-10 ">
+        <header class="border-b-2 border-slate-900 pb-3 mb-6 flex justify-between items-end">
+          <div>
+            
+            <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight leading-tight">Los hijos de Sión</h2>
+            <div class="flex items-center gap-3 mt-1 text-xs text-slate-500 font-medium">
+              <span>Autor: <strong class="text-slate-700">Tradicional / Alabanza</strong></span>
+              <span>• Tono original: <strong class="text-slate-700">C</strong></span>
+              
+            </div>
+          </div>
+        </header>
+      <div class="" style="font-size: 16px;"><div class="verse-block"><div class="song-line">
+            <span class="chord-pair">
+              <span class="chord-badge">&nbsp;</span>
+              <span class="lyric-text">//Los </span>
+            </span>
+          
+            <span class="chord-pair">
+              <span class="chord-badge text-blue-700">C</span>
+              <span class="lyric-text">hijos de Sión, se </span>
+            </span>
+          
+            <span class="chord-pair">
+              <span class="chord-badge text-blue-700">F</span>
+              <span class="lyric-text">gozan en su </span>
+            </span>
+          
+            <span class="chord-pair">
+              <span class="chord-badge text-blue-700">C</span>
+              <span class="lyric-text">Rey</span>
+            </span>
+          </div><div class="song-line">
+            <span class="chord-pair">
+              <span class="chord-badge">&nbsp;</span>
+              <span class="lyric-text">Se gozan en su Rey can</span>
+            </span>
+          
+            <span class="chord-pair">
+              <span class="chord-badge text-blue-700">G</span>
+              <span class="lyric-text">tando</span>
+            </span>
+          </div><div class="song-line">
+            <span class="chord-pair">
+              <span class="chord-badge">&nbsp;</span>
+              <span class="lyric-text">Con pan</span>
+            </span>
+          
+            <span class="chord-pair">
+              <span class="chord-badge text-blue-700">C</span>
+              <span class="lyric-text">deros y arpas, </span>
+            </span>
+          
+            <span class="chord-pair">
+              <span class="chord-badge text-blue-700">F</span>
+              <span class="lyric-text">cantan alabanzas</span>
+            </span>
+          </div><div class="song-line">
+            <span class="chord-pair">
+              <span class="chord-badge text-blue-700">C</span>
+              <span class="lyric-text">Cantan ala</span>
+            </span>
+          
+            <span class="chord-pair">
+              <span class="chord-badge text-blue-700">G</span>
+              <span class="lyric-text">banzas al </span>
+            </span>
+          
+            <span class="chord-pair">
+              <span class="chord-badge text-blue-700">C</span>
+              <span class="lyric-text">rey //</span>
+            </span>
+          </div></div><div class="h-4"></div><div class="verse-block"><div class="font-bold text-xs uppercase tracking-wider text-slate-400 mt-2.5 mb-1 font-mono-code">Coro</div><div class="song-line">
+            <span class="chord-pair">
+              <span class="chord-badge">&nbsp;</span>
+              <span class="lyric-text">//</span>
+            </span>
+          
+            <span class="chord-pair">
+              <span class="chord-badge text-blue-700">C</span>
+              <span class="lyric-text">Aleluya, </span>
+            </span>
+          
+            <span class="chord-pair">
+              <span class="chord-badge text-blue-700">F</span>
+              <span class="lyric-text">ale</span>
+            </span>
+          
+            <span class="chord-pair">
+              <span class="chord-badge text-blue-700">C</span>
+              <span class="lyric-text">luya, </span>
+            </span>
+          
+            <span class="chord-pair">
+              <span class="chord-badge text-blue-700">F</span>
+              <span class="lyric-text">ale</span>
+            </span>
+          
+            <span class="chord-pair">
+              <span class="chord-badge text-blue-700">C</span>
+              <span class="lyric-text">luya,</span>
+            </span>
+          </div><div class="song-line">
+            <span class="chord-pair">
+              <span class="chord-badge text-blue-700">G</span>
+              <span class="lyric-text">am</span>
+            </span>
+          
+            <span class="chord-pair">
+              <span class="chord-badge text-blue-700">C</span>
+              <span class="lyric-text">én//</span>
+            </span>
+          </div></div></div></article></div>
+
+    </section>
+
+  </div>
+
+  <!-- MODAL: Syntax Help Guide -->
+  <div id="modalSyntax" class="no-print fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-slate-200 space-y-4">
+      <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+        <h3 class="text-base font-bold text-slate-900 flex items-center gap-2">
+          <span class="p-1.5 bg-indigo-50 text-indigo-600 rounded-lg">🎵</span>
+          Formato de Cifrado (ChordPro)
+        </h3>
+        <button onclick="closeModal('modalSyntax')" class="text-slate-400 hover:text-slate-600">✕</button>
+      </div>
+
+      <div class="space-y-3 text-xs text-slate-600 leading-relaxed">
+        <p>Escribe la letra con total normalidad e introduce el acorde entre corchetes <code>[Acorde]</code> <strong>justo antes</strong> de la letra o sílaba donde debe sonar.</p>
+
+        <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 font-mono-code text-[11px] space-y-1">
+          <p class="text-slate-400">// Ejemplo directo:</p>
+          <p class="text-indigo-700 font-semibold">//[G]No hay Dios que pueda hacer las [D]obras</p>
+          <p class="text-indigo-700 font-semibold">como las que [A]haces tú// [D]</p>
+        </div>
+
+        <ul class="list-disc list-inside space-y-1">
+          <li><strong>Secciones:</strong> Escribe <code># Coro</code>, <code># Estrofa 1</code> o <code># Puente</code> para resaltar títulos de sección.</li>
+          <li><strong>Acordes al final:</strong> Si un acorde va al aire al final de una frase, ponlo con un espacio: <code>tú// [D]</code>.</li>
+          <li><strong>Transposición:</strong> Cambia de tono en tiempo real (+1 / -1 semitono) sin alterar tu texto original.</li>
+        </ul>
+      </div>
+
+      <div class="pt-2 flex justify-end">
+        <button onclick="closeModal('modalSyntax')" class="px-4 py-2 bg-indigo-600 text-white rounded-xl text-xs font-semibold hover:bg-indigo-700 transition">Entendido</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: GitHub Pages Deployment Guide -->
+  <div id="modalGithub" class="no-print fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-xl w-full p-6 shadow-2xl border border-slate-200 space-y-4">
+      <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+        <h3 class="text-base font-bold text-slate-900 flex items-center gap-2">
+          <svg class="w-5 h-5 text-slate-800" fill="currentColor" viewBox="0 0 24 24"><path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"></path></svg>
+          Cómo publicar gratis en GitHub Pages
+        </h3>
+        <button onclick="closeModal('modalGithub')" class="text-slate-400 hover:text-slate-600">✕</button>
+      </div>
+
+      <div class="space-y-3 text-xs text-slate-600 leading-relaxed">
+        <p>Este proyecto está estructurado en <strong>un único archivo HTML independiente</strong>. Para tener tu propio cancionero online disponible desde el celular o tablet de toda tu banda:</p>
+
+        <ol class="list-decimal list-inside space-y-2 font-medium text-slate-700">
+          <li>Crea un nuevo repositorio en tu cuenta de <a href="https://github.com" target="_blank" class="text-indigo-600 underline">GitHub</a> (por ejemplo: <code>cancionero-iglesia</code> o <code>my-songbook</code>) como <strong>Público</strong>.</li>
+          <li>Guarda este código como un archivo llamado estrictamente <code class="bg-slate-100 px-1 py-0.5 rounded text-indigo-700 font-mono">index.html</code>.</li>
+          <li>Sube el archivo <code class="font-mono">index.html</code> a la rama principal (<code>main</code>).</li>
+          <li>En tu repositorio en GitHub, ve a <strong>Settings</strong> &gt; <strong>Pages</strong>.</li>
+          <li>En <strong>Branch</strong>, selecciona <code class="font-bold">main</code> y la carpeta <code class="font-bold">/ (root)</code>, luego pulsa <strong>Save</strong>.</li>
+        </ol>
+
+        <div class="p-3 bg-emerald-50 text-emerald-800 rounded-xl border border-emerald-200 text-[11px]">
+          🎉 En 1 minuto tendrás tu enlace público (ej. <code>https://tu-usuario.github.io/cancionero</code>) accesible desde cualquier navegador sin pagar nada. Tus canciones se guardan automáticamente en tu dispositivo.
+        </div>
+      </div>
+
+      <div class="pt-2 flex justify-between items-center">
+        <button id="btnDownloadHTML" class="px-3 py-1.5 text-xs font-semibold text-indigo-700 bg-indigo-50 hover:bg-indigo-100 rounded-lg border border-indigo-200 transition">
+          Descargar index.html
+        </button>
+        <button onclick="closeModal('modalGithub')" class="px-4 py-2 bg-slate-900 text-white rounded-xl text-xs font-semibold hover:bg-slate-800 transition">Cerrar</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    /* ==========================================================================
+       SONGCRAFT CORE LOGIC (Storage, Parsing, Transposing, Songbook Export)
+       ========================================================================== */
+
+    const STORAGE_KEY = 'songcraft_library_v1';
+
+    // Sample database when starting fresh
+    const DEFAULT_SONGS = [
+      {
+        id: 'song-1',
+        title: 'Los hijos de Sión',
+        artist: 'Tradicional / Alabanza',
+        key: 'C',
+        transpose: 0,
+        content: `//Los [C]hijos de Sión, se [F]gozan en su [C]Rey
+Se gozan en su Rey can[G]tando
+Con pan[C]deros y arpas, [F]cantan alabanzas
+[C]Cantan ala[G]banzas al [C]rey //
+
+# Coro
+//[C]Aleluya, [F]ale[C]luya, [F]ale[C]luya,
+[G]am[C]én//`
+      },
+      {
+        id: 'song-2',
+        title: 'No hay Dios que pueda hacer las obras',
+        artist: 'Inspiración',
+        key: 'D',
+        transpose: 0,
+        content: `//No hay [G]Dios que pueda hacer las [D]obras
+como las que [A]haces tú // [D]
+
+# Coro
+//No es con [D]espada, ni con ejércitos
+mas con su [A]Santo Espíri[D]tu//
+
+Y esas [G]almas se salvarán [D]
+Y esas [A]almas se salvarán [D]
+Con su [A]Santo Espíri[D]tu`
+      },
+      {
+        id: 'song-3',
+        title: 'Tu Fidelidad',
+        artist: 'Marcos Witt',
+        key: 'D',
+        transpose: 0,
+        content: `[D]Tu fidelidad es [Em]grande
+[A]tu fidelidad incompa[D]rable es
+[Bm]nadie como tú, ben[Em]dito Dios
+[A]grande es tu fideli[D]dad`
+      }
+    ];
+
+    // Global application state
+    let appState = {
+      songs: [],
+      activeSongId: null,
+      selectedSongIds: new Set(),
+      viewMode: 'single', // 'single' | 'book'
+      fontSize: 16,
+      twoColumns: false,
+      chordColorClass: 'text-blue-700',
+      searchQuery: ''
+    };
+
+    // Chromatic scales
+    const NOTES_SHARPS = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+    const NOTES_FLATS  = ['C', 'Db', 'D', 'Eb', 'E', 'F', 'Gb', 'G', 'Ab', 'A', 'Bb', 'B'];
+
+    // DOM Elements Cache
+    const songListContainer = document.getElementById('songListContainer');
+    const songCount = document.getElementById('songCount');
+    const selectedCountBadge = document.getElementById('selectedCountBadge');
+    const checkSelectAll = document.getElementById('checkSelectAll');
+    const searchInput = document.getElementById('searchInput');
+
+    const editTitle = document.getElementById('editTitle');
+    const editKey = document.getElementById('editKey');
+    const editArtist = document.getElementById('editArtist');
+    const editBody = document.getElementById('editBody');
+
+    const modeSingleBtn = document.getElementById('modeSingleBtn');
+    const modeBookBtn = document.getElementById('modeBookBtn');
+    const modeBookCount = document.getElementById('modeBookCount');
+    const printDocument = document.getElementById('printDocument');
+
+    const transposeDisplay = document.getElementById('transposeDisplay');
+    const transposeControls = document.getElementById('transposeControls');
+    const selectColor = document.getElementById('selectColor');
+    const btnToggleColumns = document.getElementById('btnToggleColumns');
+    const columnsLabel = document.getElementById('columnsLabel');
+
+    const toast = document.getElementById('toast');
+    const toastMsg = document.getElementById('toastMsg');
+
+    /* --------------------------------------------------------------------------
+       Storage Helpers
+       -------------------------------------------------------------------------- */
+    function loadSongs() {
+      try {
+        const stored = localStorage.getItem(STORAGE_KEY);
+        if (stored) {
+          appState.songs = JSON.parse(stored);
+        } else {
+          appState.songs = [...DEFAULT_SONGS];
+          saveSongs();
+        }
+      } catch (e) {
+        console.error('Error cargando localStorage:', e);
+        appState.songs = [...DEFAULT_SONGS];
+      }
+
+      if (appState.songs.length > 0) {
+        appState.activeSongId = appState.songs[0].id;
+        // Select all by default for immediate songbook creation
+        appState.selectedSongIds = new Set(appState.songs.map(s => s.id));
+      }
+    }
+
+    function saveSongs() {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(appState.songs));
+      } catch (e) {
+        console.error('Error guardando en localStorage:', e);
+      }
+    }
+
+    function getActiveSong() {
+      return appState.songs.find(s => s.id === appState.activeSongId) || null;
+    }
+
+    /* --------------------------------------------------------------------------
+       Chord Transposition Logic
+       -------------------------------------------------------------------------- */
+    function transposeChord(chordStr, semitones) {
+      if (!semitones || semitones === 0) return chordStr;
+
+      return chordStr.replace(/([A-G][b#]?)/g, (match) => {
+        let idx = NOTES_SHARPS.indexOf(match);
+        if (idx === -1) idx = NOTES_FLATS.indexOf(match);
+        if (idx === -1) return match;
+
+        let nextIdx = (idx + semitones) % 12;
+        if (nextIdx < 0) nextIdx += 12;
+
+        return NOTES_SHARPS[nextIdx];
+      });
+    }
+
+    /* --------------------------------------------------------------------------
+       ChordPro Parser (Interlinear Line Alignment)
+       -------------------------------------------------------------------------- */
+    function parseChordProLine(line) {
+      const tokens = [];
+      const regex = /\[(.*?)\]/g;
+      let lastIndex = 0;
+      let currentChord = '';
+
+      let match;
+      while ((match = regex.exec(line)) !== null) {
+        const textSegment = line.substring(lastIndex, match.index);
+        if (currentChord || textSegment) {
+          tokens.push({ chord: currentChord, text: textSegment });
+        }
+        currentChord = match[1];
+        lastIndex = regex.lastIndex;
+      }
+
+      const remainingText = line.substring(lastIndex);
+      if (currentChord || remainingText) {
+        tokens.push({ chord: currentChord, text: remainingText });
+      }
+
+      return tokens;
+    }
+
+    function escapeHtml(str) {
+      return str
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
+    }
+
+    /* --------------------------------------------------------------------------
+       Song HTML Renderer
+       -------------------------------------------------------------------------- */
+    function renderSongHTML(song, transposeOffset = 0, isPartOfBook = false, songIndex = null) {
+      const semitones = (song.transpose || 0) + transposeOffset;
+      const lines = (song.content || '').split('\n');
+      
+      let html = '';
+      html += `<article class="song-sheet mb-10 ${isPartOfBook ? 'song-page-break' : ''}">`;
+
+      // Header of the sheet
+      html += `
+        <header class="border-b-2 border-slate-900 pb-3 mb-6 flex justify-between items-end">
+          <div>
+            ${isPartOfBook && songIndex !== null ? `<span class="text-xs font-bold text-indigo-600 block mb-0.5">Canción #${songIndex + 1}</span>` : ''}
+            <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight leading-tight">${escapeHtml(song.title || 'Sin Título')}</h2>
+            <div class="flex items-center gap-3 mt-1 text-xs text-slate-500 font-medium">
+              ${song.artist ? `<span>Autor: <strong class="text-slate-700">${escapeHtml(song.artist)}</strong></span>` : ''}
+              ${song.key ? `<span>• Tono original: <strong class="text-slate-700">${escapeHtml(song.key)}</strong></span>` : ''}
+              ${semitones !== 0 ? `<span class="bg-amber-100 text-amber-800 px-1.5 py-0.2 rounded font-bold">Transp: ${semitones > 0 ? '+' : ''}${semitones} semitono(s)</span>` : ''}
+            </div>
+          </div>
+        </header>
+      `;
+
+      // Body lines
+      const columnClass = appState.twoColumns ? 'song-columns-2' : '';
+      html += `<div class="${columnClass}" style="font-size: ${appState.fontSize}px;">`;
+
+      let insideVerse = false;
+
+      lines.forEach((line) => {
+        const trimmed = line.trim();
+
+        if (trimmed === '') {
+          if (insideVerse) {
+            html += `</div>`;
+            insideVerse = false;
+          }
+          html += `<div class="h-4"></div>`;
+          return;
+        }
+
+        if (!insideVerse) {
+          html += `<div class="verse-block">`;
+          insideVerse = true;
+        }
+
+        // Heading or comments like # Coro
+        if (trimmed.startsWith('#') || (trimmed.startsWith('{comment:') && trimmed.endsWith('}'))) {
+          const comment = trimmed.replace(/^#\s*/, '').replace(/^{comment:\s*/, '').replace(/}$/, '');
+          html += `<div class="font-bold text-xs uppercase tracking-wider text-slate-400 mt-2.5 mb-1 font-mono-code">${escapeHtml(comment)}</div>`;
+          return;
+        }
+
+        // Standard lyrics with chords
+        const tokens = parseChordProLine(line);
+        html += `<div class="song-line">`;
+
+        tokens.forEach((tok) => {
+          const transChord = tok.chord ? transposeChord(tok.chord, semitones) : '';
+          const chordSpan = transChord
+            ? `<span class="chord-badge ${appState.chordColorClass}">${escapeHtml(transChord)}</span>`
+            : `<span class="chord-badge">&nbsp;</span>`;
+
+          const lyricSpan = tok.text 
+            ? `<span class="lyric-text">${escapeHtml(tok.text)}</span>` 
+            : `<span class="lyric-text">&nbsp;</span>`;
+
+          html += `
+            <span class="chord-pair">
+              ${chordSpan}
+              ${lyricSpan}
+            </span>
+          `;
+        });
+
+        html += `</div>`;
+      });
+
+      if (insideVerse) {
+        html += `</div>`;
+      }
+
+      html += `</div>`; // Close columns container
+      html += `</article>`;
+
+      return html;
+    }
+
+    /* --------------------------------------------------------------------------
+       Render Main Display (Single song or compiled Songbook)
+       -------------------------------------------------------------------------- */
+    function renderMainDisplay() {
+      if (appState.viewMode === 'single') {
+        const song = getActiveSong();
+        if (!song) {
+          printDocument.innerHTML = `
+            <div class="h-64 flex flex-col items-center justify-center text-slate-400 text-center p-6">
+              <svg class="w-12 h-12 mb-2 stroke-current opacity-40" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"/></svg>
+              <p class="font-medium text-sm">No hay ninguna canción seleccionada.</p>
+              <button onclick="createNewSong()" class="mt-2 text-xs text-indigo-600 font-semibold underline">Crear una nueva</button>
+            </div>
+          `;
+          return;
+        }
+
+        transposeControls.style.display = 'flex';
+        transposeDisplay.textContent = (song.transpose > 0 ? `+${song.transpose}` : `${song.transpose || 0}`);
+        printDocument.innerHTML = renderSongHTML(song, 0, false);
+      } 
+      else {
+        // Songbook Mode (Multi-song compile)
+        transposeControls.style.display = 'none';
+
+        const selectedList = appState.songs.filter(s => appState.selectedSongIds.has(s.id));
+        if (selectedList.length === 0) {
+          printDocument.innerHTML = `
+            <div class="h-64 flex flex-col items-center justify-center text-slate-400 text-center p-6">
+              <p class="font-medium text-sm text-slate-600">No hay canciones marcadas para el Cancionero.</p>
+              <p class="text-xs text-slate-400 mt-1">Marca las casillas de verificación en la lista izquierda para compilar tu setlist.</p>
+            </div>
+          `;
+          return;
+        }
+
+        let bookHTML = '';
+
+        // Table of Contents (Índice)
+        bookHTML += `
+          <div class="toc-page mb-12 border-b-4 border-slate-900 pb-8">
+            <div class="text-center mb-8 pt-4">
+              <h1 class="text-3xl font-extrabold uppercase tracking-widest text-slate-900">Repertorio Musical</h1>
+              <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider mt-1">Compilado con SongCraft • ${selectedList.length} Canciones</p>
+            </div>
+            
+            <div class="max-w-xl mx-auto">
+              <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-3 border-b border-slate-200 pb-1">Índice de Canciones</h3>
+              <div class="divide-y divide-slate-100">
+        `;
+
+        selectedList.forEach((song, idx) => {
+          bookHTML += `
+            <div class="py-2 flex items-center justify-between text-sm">
+              <div class="flex items-center gap-2">
+                <span class="font-mono text-xs font-bold text-indigo-600 w-6">${idx + 1}.</span>
+                <span class="font-semibold text-slate-800">${escapeHtml(song.title)}</span>
+              </div>
+              <span class="text-xs font-mono text-slate-500 bg-slate-100 px-2 py-0.5 rounded">${escapeHtml(song.key || 'Tono')}</span>
+            </div>
+          `;
+        });
+
+        bookHTML += `
+              </div>
+            </div>
+          </div>
+        `;
+
+        // Render each song with automatic page break for printing
+        selectedList.forEach((song, idx) => {
+          bookHTML += renderSongHTML(song, 0, true, idx);
+        });
+
+        printDocument.innerHTML = bookHTML;
+      }
+    }
+
+    /* --------------------------------------------------------------------------
+       Render Library List
+       -------------------------------------------------------------------------- */
+    function renderLibraryList() {
+      const q = appState.searchQuery.toLowerCase().trim();
+      const filtered = appState.songs.filter(s => {
+        return (s.title && s.title.toLowerCase().includes(q)) ||
+               (s.artist && s.artist.toLowerCase().includes(q)) ||
+               (s.key && s.key.toLowerCase().includes(q));
+      });
+
+      songCount.textContent = appState.songs.length;
+      modeBookCount.textContent = appState.selectedSongIds.size;
+      selectedCountBadge.textContent = `${appState.selectedSongIds.size} sel.`;
+
+      // Master checkbox status
+      if (appState.songs.length > 0 && appState.selectedSongIds.size === appState.songs.length) {
+        checkSelectAll.checked = true;
+        checkSelectAll.indeterminate = false;
+      } else if (appState.selectedSongIds.size > 0) {
+        checkSelectAll.checked = false;
+        checkSelectAll.indeterminate = true;
+      } else {
+        checkSelectAll.checked = false;
+        checkSelectAll.indeterminate = false;
+      }
+
+      if (filtered.length === 0) {
+        songListContainer.innerHTML = `
+          <div class="py-8 text-center text-xs text-slate-400">
+            No se encontraron canciones.
+          </div>
+        `;
+        return;
+      }
+
+      let html = '';
+      filtered.forEach((song) => {
+        const isActive = (song.id === appState.activeSongId);
+        const isChecked = appState.selectedSongIds.has(song.id);
+
+        html += `
+          <div class="group flex items-center gap-2.5 p-2.5 rounded-xl transition cursor-pointer ${isActive ? 'bg-indigo-50/80 border border-indigo-200' : 'hover:bg-slate-50'}" onclick="selectActiveSong('${song.id}')">
+            <!-- Selection Checkbox -->
+            <input type="checkbox" ${isChecked ? 'checked' : ''} class="rounded text-indigo-600 focus:ring-0 cursor-pointer" onclick="event.stopPropagation(); toggleSongSelection('${song.id}')">
+            
+            <!-- Song Meta -->
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center justify-between">
+                <h4 class="text-xs font-bold truncate ${isActive ? 'text-indigo-950' : 'text-slate-800'}">${escapeHtml(song.title || 'Sin Título')}</h4>
+                ${song.key ? `<span class="text-[10px] font-mono font-bold bg-slate-200/80 text-slate-700 px-1 rounded">${escapeHtml(song.key)}</span>` : ''}
+              </div>
+              <p class="text-[11px] text-slate-400 truncate">${escapeHtml(song.artist || 'Sin autor')}</p>
+            </div>
+          </div>
+        `;
+      });
+
+      songListContainer.innerHTML = html;
+    }
+
+    /* --------------------------------------------------------------------------
+       Editor Sync
+       -------------------------------------------------------------------------- */
+    function syncEditorInputs() {
+      const song = getActiveSong();
+      if (!song) {
+        editTitle.value = '';
+        editKey.value = '';
+        editArtist.value = '';
+        editBody.value = '';
+        return;
+      }
+
+      editTitle.value = song.title || '';
+      editKey.value = song.key || '';
+      editArtist.value = song.artist || '';
+      editBody.value = song.content || '';
+    }
+
+    function selectActiveSong(id) {
+      appState.activeSongId = id;
+      syncEditorInputs();
+      renderLibraryList();
+      renderMainDisplay();
+    }
+
+    function toggleSongSelection(id) {
+      if (appState.selectedSongIds.has(id)) {
+        appState.selectedSongIds.delete(id);
+      } else {
+        appState.selectedSongIds.add(id);
+      }
+      renderLibraryList();
+      if (appState.viewMode === 'book') {
+        renderMainDisplay();
+      }
+    }
+
+    function createNewSong() {
+      const newSong = {
+        id: 'song-' + Date.now(),
+        title: 'Nueva Canción',
+        artist: '',
+        key: 'C',
+        transpose: 0,
+        content: `//[C]Escribe aquí la primera [G]línea
+y los [Am]acordes entre cor[F]chetes//`
+      };
+
+      appState.songs.unshift(newSong);
+      appState.activeSongId = newSong.id;
+      appState.selectedSongIds.add(newSong.id);
+      saveSongs();
+      renderLibraryList();
+      syncEditorInputs();
+      renderMainDisplay();
+      showToast('Nueva canción creada');
+    }
+
+    /* --------------------------------------------------------------------------
+       Toast Notification
+       -------------------------------------------------------------------------- */
+    function showToast(msg) {
+      toastMsg.textContent = msg;
+      toast.classList.remove('opacity-0');
+      toast.classList.add('opacity-100');
+      setTimeout(() => {
+        toast.classList.remove('opacity-100');
+        toast.classList.add('opacity-0');
+      }, 2000);
+    }
+
+    /* --------------------------------------------------------------------------
+       Quick Chord Inserter
+       -------------------------------------------------------------------------- */
+    window.insertChord = function(chordStr) {
+      const start = editBody.selectionStart;
+      const end = editBody.selectionEnd;
+      const text = editBody.value;
+      editBody.value = text.substring(0, start) + chordStr + text.substring(end);
+      editBody.focus();
+      editBody.selectionStart = editBody.selectionEnd = start + chordStr.length;
+
+      // Update model
+      const song = getActiveSong();
+      if (song) {
+        song.content = editBody.value;
+        saveSongs();
+        renderMainDisplay();
+      }
+    };
+
+    /* --------------------------------------------------------------------------
+       Modals Management
+       -------------------------------------------------------------------------- */
+    window.closeModal = function(id) {
+      document.getElementById(id).classList.add('hidden');
+    };
+
+    document.getElementById('btnOpenSyntaxHelp').addEventListener('click', () => {
+      document.getElementById('modalSyntax').classList.remove('hidden');
+    });
+
+    document.getElementById('btnOpenGithubGuide').addEventListener('click', () => {
+      document.getElementById('modalGithub').classList.remove('hidden');
+    });
+
+    /* --------------------------------------------------------------------------
+       Download HTML for Github Pages
+       -------------------------------------------------------------------------- */
+    document.getElementById('btnDownloadHTML').addEventListener('click', () => {
+      const sourceHtml = "<!DOCTYPE html>\n" + document.documentElement.outerHTML;
+      const blob = new Blob([sourceHtml], { type: 'text/html' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'index.html';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      showToast('Descargando index.html para GitHub');
+    });
+
+    /* --------------------------------------------------------------------------
+       Event Bindings & Real-time Listeners
+       -------------------------------------------------------------------------- */
+    // Input modifications
+    function handleSongInput() {
+      const song = getActiveSong();
+      if (!song) return;
+
+      song.title = editTitle.value;
+      song.key = editKey.value;
+      song.artist = editArtist.value;
+      song.content = editBody.value;
+
+      saveSongs();
+      renderLibraryList();
+      renderMainDisplay();
+    }
+
+    editTitle.addEventListener('input', handleSongInput);
+    editKey.addEventListener('input', handleSongInput);
+    editArtist.addEventListener('input', handleSongInput);
+    editBody.addEventListener('input', handleSongInput);
+
+    // Search input
+    searchInput.addEventListener('input', (e) => {
+      appState.searchQuery = e.target.value;
+      renderLibraryList();
+    });
+
+    // Check All toggle
+    checkSelectAll.addEventListener('change', (e) => {
+      if (e.target.checked) {
+        appState.selectedSongIds = new Set(appState.songs.map(s => s.id));
+      } else {
+        appState.selectedSongIds.clear();
+      }
+      renderLibraryList();
+      if (appState.viewMode === 'book') {
+        renderMainDisplay();
+      }
+    });
+
+    // View Mode switch
+    modeSingleBtn.addEventListener('click', () => {
+      appState.viewMode = 'single';
+      modeSingleBtn.className = 'px-3 py-1 rounded-lg font-semibold transition bg-white shadow-xs text-indigo-700';
+      modeBookBtn.className = 'px-3 py-1 rounded-lg font-semibold transition text-slate-600 hover:text-slate-900';
+      renderMainDisplay();
+    });
+
+    modeBookBtn.addEventListener('click', () => {
+      appState.viewMode = 'book';
+      modeBookBtn.className = 'px-3 py-1 rounded-lg font-semibold transition bg-white shadow-xs text-indigo-700';
+      modeSingleBtn.className = 'px-3 py-1 rounded-lg font-semibold transition text-slate-600 hover:text-slate-900';
+      renderMainDisplay();
+    });
+
+    // Transpose
+    document.getElementById('btnTransposeUp').addEventListener('click', () => {
+      const song = getActiveSong();
+      if (!song) return;
+      song.transpose = (song.transpose || 0) + 1;
+      saveSongs();
+      renderMainDisplay();
+    });
+
+    document.getElementById('btnTransposeDown').addEventListener('click', () => {
+      const song = getActiveSong();
+      if (!song) return;
+      song.transpose = (song.transpose || 0) - 1;
+      saveSongs();
+      renderMainDisplay();
+    });
+
+    document.getElementById('btnTransposeReset').addEventListener('click', () => {
+      const song = getActiveSong();
+      if (!song) return;
+      song.transpose = 0;
+      saveSongs();
+      renderMainDisplay();
+    });
+
+    // Color Selector
+    selectColor.addEventListener('change', (e) => {
+      appState.chordColorClass = e.target.value;
+      renderMainDisplay();
+    });
+
+    // Columns toggle
+    btnToggleColumns.addEventListener('click', () => {
+      appState.twoColumns = !appState.twoColumns;
+      columnsLabel.textContent = appState.twoColumns ? '2 Col' : '1 Col';
+      renderMainDisplay();
+    });
+
+    // Font size adjustments
+    document.getElementById('btnFontUp').addEventListener('click', () => {
+      if (appState.fontSize < 24) {
+        appState.fontSize += 1;
+        renderMainDisplay();
+      }
+    });
+
+    document.getElementById('btnFontDown').addEventListener('click', () => {
+      if (appState.fontSize > 12) {
+        appState.fontSize -= 1;
+        renderMainDisplay();
+      }
+    });
+
+    // New, Delete, Duplicate
+    document.getElementById('btnNewSong').addEventListener('click', createNewSong);
+
+    document.getElementById('btnDuplicateSong').addEventListener('click', () => {
+      const song = getActiveSong();
+      if (!song) return;
+      const copy = {
+        ...song,
+        id: 'song-' + Date.now(),
+        title: `${song.title} (Copia)`
+      };
+      appState.songs.unshift(copy);
+      appState.activeSongId = copy.id;
+      appState.selectedSongIds.add(copy.id);
+      saveSongs();
+      renderLibraryList();
+      syncEditorInputs();
+      renderMainDisplay();
+      showToast('Canción duplicada');
+    });
+
+    document.getElementById('btnDeleteSong').addEventListener('click', () => {
+      const song = getActiveSong();
+      if (!song) return;
+      
+      const confirmDelete = confirm(`¿Estás seguro de eliminar "${song.title}"?`);
+      if (!confirmDelete) return;
+
+      appState.songs = appState.songs.filter(s => s.id !== song.id);
+      appState.selectedSongIds.delete(song.id);
+
+      appState.activeSongId = appState.songs.length > 0 ? appState.songs[0].id : null;
+      saveSongs();
+      renderLibraryList();
+      syncEditorInputs();
+      renderMainDisplay();
+      showToast('Canción eliminada');
+    });
+
+    // Export PDF via window.print()
+    document.getElementById('btnExportPDF').addEventListener('click', () => {
+      window.print();
+    });
+
+    // JSON Backup Export
+    document.getElementById('btnExportJSON').addEventListener('click', () => {
+      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(appState.songs, null, 2));
+      const downloadAnchor = document.createElement('a');
+      downloadAnchor.setAttribute("href", dataStr);
+      downloadAnchor.setAttribute("download", `cancionero_backup_${new Date().toISOString().slice(0,10)}.json`);
+      document.body.appendChild(downloadAnchor);
+      downloadAnchor.click();
+      downloadAnchor.remove();
+      showToast('Archivo de respaldo exportado');
+    });
+
+    // JSON Backup Import
+    document.getElementById('importJSONFile').addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(evt) {
+        try {
+          const imported = JSON.parse(evt.target.result);
+          if (Array.isArray(imported)) {
+            appState.songs = imported;
+            appState.activeSongId = imported.length > 0 ? imported[0].id : null;
+            appState.selectedSongIds = new Set(imported.map(s => s.id));
+            saveSongs();
+            renderLibraryList();
+            syncEditorInputs();
+            renderMainDisplay();
+            showToast('Repertorio importado exitosamente');
+          } else {
+            showToast('Formato JSON no válido');
+          }
+        } catch (err) {
+          showToast('Error al leer el archivo JSON');
+        }
+      };
+      reader.readAsText(file);
+    });
+
+    // Reset default sample songs
+    document.getElementById('btnResetSamples').addEventListener('click', () => {
+      if (confirm('¿Restablecer las canciones de ejemplo originales? (Se conservarán junto a las tuyas)')) {
+        DEFAULT_SONGS.forEach(s => {
+          if (!appState.songs.some(existing => existing.title === s.title)) {
+            appState.songs.push({ ...s, id: 'song-' + Date.now() + Math.random() });
+          }
+        });
+        saveSongs();
+        renderLibraryList();
+        showToast('Muestras agregadas');
+      }
+    });
+
+    /* --------------------------------------------------------------------------
+       Init
+       -------------------------------------------------------------------------- */
+    window.onload = function() {
+      loadSongs();
+      renderLibraryList();
+      syncEditorInputs();
+      renderMainDisplay();
+    };
+  </script>
+
+</body></html>
