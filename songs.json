@@ -1,0 +1,74 @@
+[
+  {
+    "id": "song-1792606380779",
+    "title": "Nueva Canción",
+    "artist": "",
+    "key": "C",
+    "transpose": 0,
+    "content": "//[C]Escribe aquí la primera [G]línea\ny los [Am]acordes entre cor[F]chetes//"
+  },
+  {
+    "id": "song-1792605952617",
+    "title": "Oh poder pentecostal ven hoy a mi",
+    "artist": "",
+    "key": "C",
+    "transpose": 0,
+    "content": "Oh po[D]der pentecostal ven hoy a mi\nOh poder pentecostal ven hoy a [A]mi\nYo quie[D]ro sentir el gozo\nDe este [G]fuego tan glorioso\nOh po[D]der pentecos[A]tal ven hoy a [D]mí.\n\n//En[D]vía tu poder envía tu poder\nEnvía tu poder Se[A]ñor\nEnvía tu poder envía tu poder\nEn[G]vía tu po[A]der Se[D]ñor //\n\n//Manda f[D]uego Señor manda f[G]uego Señor\nY bau[D]tízanos con tu po[A]der\nManda f[D]uego Señor manda f[G]uego Señor\nY bau[D]tízanos con [A]tu po[D]der //"
+  },
+  {
+    "id": "song-1792605709418",
+    "title": "Viva la fe",
+    "artist": "",
+    "key": "C",
+    "transpose": 0,
+    "content": "Viva la [C]fe, viva la Esperanza, viva el A[G]mor\nViva la fe, viva la Esperanza, viva el A[C]mor\nViva la fe, viva la Esperanza, viva el A[F]mor\nQue viva [C]Cristo, que viva [G]Cristo, que viva el [C]rey\n\n//Que viva [G]Cristo, que viva, que viva [C]Cristo\nQue [Am]viva, que viva [Dm]Cristo, que [G]viva el [C]rey//"
+  },
+  {
+    "id": "song-1792605377117",
+    "title": "Esta alegría no va a salir",
+    "artist": "",
+    "key": "C",
+    "transpose": 0,
+    "content": "Esta ale[C]gría no va a sa[G]lir, no va a salir\nEsta alegría no va a sa[C]lir, no va a salir\nEsta alegría no va a sa[F]lir\nPorque esta [C]dentro de mi [G]cora[C]zón.\n\n// El fuego [G]cae, cae, cae\nLos males [C]salen, salen, salen\nY el cre[G]yente alaba a su Se[C]ñor //"
+  },
+  {
+    "id": "song-1792604463280",
+    "title": "Va bajando ya",
+    "artist": "",
+    "key": "C",
+    "transpose": 0,
+    "content": "Va baj[C]ando ya, va bajando ya\nVa bajando la gloria de Jeho[G]vá\nSi su [F]pueblo empieza a o[G]rar\nEl Se[C]ñor empieza a o[Am]brar\nVa ba[Dm]jando la [G]gloria de Jeho[C]vá"
+  },
+  {
+    "id": "song-1792604256818",
+    "title": "Te Alabarán Oh Jehová",
+    "artist": "",
+    "key": "C",
+    "transpose": 0,
+    "content": "//Te Alaba[C]rán Oh Jehová Todos los Reyes\nTodos los reyes de la [G]Tierra\nPorque han oído los dichos de tu boca\nY canta[F]rán de los ca[G]minos de Jeho[C]vá//\n//Porque la [F]Gloria de Jehová es Grande\nPorque Jehová es Excelso en sus ca[C]minos\nPorque Jeho[Am]vá atiende al hu[Dm]milde\nMas [G]mira de lejos al al[C]tivo//"
+  },
+  {
+    "id": "song-1",
+    "title": "Los hijos de Sión",
+    "artist": "Tradicional / Alabanza",
+    "key": "C",
+    "transpose": 0,
+    "content": "//Los [C]hijos de Sión, se [F]gozan en su [C]Rey\nSe gozan en su Rey can[G]tando\nCon pan[C]deros y arpas, [F]cantan alabanzas\n[C]Cantan ala[G]banzas al [C]rey //\n\n# Coro\n//[C]Aleluya, [F]ale[C]luya, [F]ale[C]luya,\n[G]am[C]én//"
+  },
+  {
+    "id": "song-2",
+    "title": "No hay Dios que pueda hacer las obras",
+    "artist": "Inspiración",
+    "key": "D",
+    "transpose": 0,
+    "content": "//No hay [G]Dios que pueda hacer las [D]obras\ncomo las que [A]haces tú // [D]\n\n# Coro\n//No es con [D]espada, ni con ejércitos\nmas con su [A]Santo Espíri[D]tu//\n\nY esas [G]almas se salvarán [D]\nY esas [A]almas se salvarán [D]\nCon su [A]Santo Espíri[D]tu"
+  },
+  {
+    "id": "song-3",
+    "title": "Tu Fidelidad",
+    "artist": "Marcos Witt",
+    "key": "D",
+    "transpose": 0,
+    "content": "[D]Tu fidelidad es [Em]grande\n[A]tu fidelidad incompa[D]rable es\n[Bm]nadie como tú, ben[Em]dito Dios\n[A]grande es tu fideli[D]dad"
+  }
+]
