@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SongCraft - Editor de Cifrados y Cancionero</title>
+  <title>SongCraft - Editor de Cifrados y Cancionero con GitHub Sync</title>
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Google Fonts -->
@@ -131,22 +131,28 @@
             <h1 class="text-base font-extrabold tracking-tight text-white">SongCraft</h1>
             <span class="text-[11px] font-semibold bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 px-2 py-0.5 rounded-full">Cancionero & PDF</span>
           </div>
-          <p class="text-[11px] text-slate-400 hidden sm:block">Editor de acordes y compilador de repertorios</p>
+          <p class="text-[11px] text-slate-400 hidden sm:block">Editor de acordes y sincronización en GitHub</p>
         </div>
       </div>
 
       <!-- Action buttons -->
-      <div class="flex items-center gap-2">
-        <button id="btnOpenGithubGuide" class="px-3 py-1.5 rounded-lg text-xs font-medium text-slate-300 hover:text-white bg-slate-800 hover:bg-slate-700 border border-slate-700 transition flex items-center gap-1.5">
-          <svg class="w-4 h-4 text-slate-400" fill="currentColor" viewBox="0 0 24 24"><path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/></svg>
-          <span class="hidden md:inline">Publicar en</span> GitHub
+      <div class="flex items-center gap-2 flex-wrap justify-end">
+        
+        <!-- GitHub Sync Button (HIGHLIGHTED) -->
+        <button id="btnOpenGithubSync" class="px-3 py-1.5 rounded-lg text-xs font-semibold text-white bg-slate-800 hover:bg-slate-700 border border-slate-700 hover:border-slate-600 transition flex items-center gap-1.5 shadow-sm">
+          <svg class="w-4 h-4 text-emerald-400" id="syncStatusIcon" fill="currentColor" viewBox="0 0 24 24">
+            <path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/>
+          </svg>
+          <span id="syncStatusLabel">Sincronizar GitHub</span>
         </button>
 
+        <!-- Syntax guide button -->
         <button id="btnOpenSyntaxHelp" class="p-2 sm:px-3 sm:py-1.5 rounded-lg text-xs font-medium text-slate-300 hover:text-white bg-slate-800 hover:bg-slate-700 border border-slate-700 transition flex items-center gap-1.5" title="Ayuda de formato">
           <svg class="w-4 h-4 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
           <span class="hidden sm:inline">Guía Formato</span>
         </button>
 
+        <!-- Export PDF button -->
         <button id="btnExportPDF" class="px-4 py-2 rounded-xl text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-500 shadow-md shadow-indigo-600/30 transition flex items-center gap-1.5">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
           <span>Exportar a PDF</span>
@@ -155,6 +161,24 @@
 
     </div>
   </header>
+
+  <!-- Cloud quick bar for push/pull notification -->
+  <div id="cloudBar" class="no-print bg-indigo-900/40 border-b border-indigo-800/40 px-4 py-1.5 text-xs text-indigo-200 flex items-center justify-between">
+    <div class="flex items-center gap-2 max-w-7xl mx-auto w-full justify-between">
+      <div class="flex items-center gap-2 truncate">
+        <span class="w-2 h-2 rounded-full bg-slate-400" id="syncStatusDot"></span>
+        <span id="cloudStatusText" class="truncate text-[11px]">GitHub: Sin vincular. Abre "Sincronizar GitHub" para conectar.</span>
+      </div>
+      <div class="flex items-center gap-2 shrink-0">
+        <button id="btnPushToGithub" class="px-2 py-0.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded text-[11px] font-semibold transition hidden">
+          Guardar en GitHub
+        </button>
+        <button id="btnPullFromGithub" class="px-2 py-0.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded text-[11px] font-medium transition hidden">
+          Cargar de GitHub
+        </button>
+      </div>
+    </div>
+  </div>
 
   <!-- Notification Toast -->
   <div id="toast" class="no-print fixed bottom-6 right-6 z-50 bg-slate-900 text-white px-4 py-3 rounded-xl shadow-2xl border border-slate-700 text-xs font-semibold opacity-0 transition-opacity duration-300 pointer-events-none flex items-center gap-2">
@@ -166,7 +190,7 @@
   <div class="flex-1 max-w-7xl w-full mx-auto p-3 sm:p-5 grid grid-cols-1 lg:grid-cols-12 gap-5">
 
     <!-- COLUMN 1: Song Library & Setlist Selection (3 Cols) -->
-    <aside class="no-print lg:col-span-3 flex flex-col bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden h-[calc(100vh-6rem)] sticky top-20">
+    <aside class="no-print lg:col-span-3 flex flex-col bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden h-[calc(100vh-8.5rem)] sticky top-28">
       
       <!-- Library Top Actions -->
       <div class="p-3.5 bg-slate-50 border-b border-slate-200 flex flex-col gap-2.5">
@@ -218,7 +242,7 @@
     </aside>
 
     <!-- COLUMN 2: Real-time ChordPro Editor (4 Cols) -->
-    <section class="no-print lg:col-span-4 flex flex-col bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden h-[calc(100vh-6rem)] sticky top-20">
+    <section class="no-print lg:col-span-4 flex flex-col bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden h-[calc(100vh-8.5rem)] sticky top-28">
       
       <!-- Editor Header -->
       <div class="px-4 py-3 bg-slate-50 border-b border-slate-200 flex items-center justify-between gap-2">
@@ -341,6 +365,70 @@
 
   </div>
 
+  <!-- MODAL: GitHub Sync Configuration (STEP 5) -->
+  <div id="modalGithubSync" class="no-print fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-slate-200 space-y-4">
+      <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+        <h3 class="text-base font-bold text-slate-900 flex items-center gap-2">
+          <svg class="w-5 h-5 text-slate-800" fill="currentColor" viewBox="0 0 24 24"><path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/></svg>
+          Sincronización en la Nube con GitHub
+        </h3>
+        <button onclick="closeModal('modalGithubSync')" class="text-slate-400 hover:text-slate-600">✕</button>
+      </div>
+
+      <p class="text-xs text-slate-600 leading-relaxed">
+        Conecta este cancionero directamente a tu repositorio para guardar y actualizar tu lista de alabanzas en la nube (archivo <code>songs.json</code>).
+      </p>
+
+      <div class="space-y-3">
+        <div>
+          <label class="block text-[11px] font-bold text-slate-600 mb-1">Usuario de GitHub</label>
+          <input id="ghUsername" type="text" class="w-full text-xs px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 font-mono" placeholder="Ej: Daniela1232a">
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-[11px] font-bold text-slate-600 mb-1">Nombre del Repositorio</label>
+            <input id="ghRepo" type="text" class="w-full text-xs px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 font-mono" placeholder="Cancionero">
+          </div>
+          <div>
+            <label class="block text-[11px] font-bold text-slate-600 mb-1">Rama (Branch)</label>
+            <input id="ghBranch" type="text" value="main" class="w-full text-xs px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 font-mono">
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-[11px] font-bold text-slate-600 mb-1">
+            Personal Access Token (classic)
+            <span class="text-slate-400 font-normal ml-1">(con permiso <code>repo</code>)</span>
+          </label>
+          <input id="ghToken" type="password" class="w-full text-xs px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 font-mono" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx">
+          <p class="text-[10px] text-slate-400 mt-1">Tu token se guarda únicamente en este navegador y viaja seguro mediante HTTPS hacia la API de GitHub.</p>
+        </div>
+      </div>
+
+      <!-- Action buttons inside modal -->
+      <div class="pt-3 border-t border-slate-100 flex flex-wrap items-center justify-between gap-2">
+        <div class="flex items-center gap-2">
+          <button id="btnModalSaveConfig" class="px-4 py-2 bg-indigo-600 text-white rounded-xl text-xs font-semibold hover:bg-indigo-700 transition">
+            Guardar Conexión
+          </button>
+          <button id="btnModalPushNow" class="px-3 py-2 bg-emerald-600 text-white rounded-xl text-xs font-semibold hover:bg-emerald-700 transition">
+            Subir canciones ahora
+          </button>
+        </div>
+
+        <button onclick="closeModal('modalGithubSync')" class="px-3 py-2 text-xs text-slate-500 hover:text-slate-800 transition">
+          Cerrar
+        </button>
+      </div>
+
+      <!-- Sync feedback log -->
+      <div id="ghSyncLog" class="p-2.5 bg-slate-50 rounded-lg border border-slate-200 text-[11px] font-mono text-slate-600 hidden">
+      </div>
+    </div>
+  </div>
+
   <!-- MODAL: Syntax Help Guide -->
   <div id="modalSyntax" class="no-print fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-4 hidden">
     <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-slate-200 space-y-4">
@@ -363,7 +451,7 @@
 
         <ul class="list-disc list-inside space-y-1">
           <li><strong>Secciones:</strong> Escribe <code># Coro</code>, <code># Estrofa 1</code> o <code># Puente</code> para resaltar títulos de sección.</li>
-          <li><strong>Acordes al final:</strong> Si un acorde va al aire al final de una frase, ponlo con un espacio: <code>tú// [D]</code>.</li>
+          <li><strong>Acordes al aire:</strong> Si un acorde va al final sin letra debajo, ponlo con un espacio: <code>tú// [D]</code>.</li>
           <li><strong>Transposición:</strong> Cambia de tono en tiempo real (+1 / -1 semitono) sin alterar tu texto original.</li>
         </ul>
       </div>
@@ -374,50 +462,15 @@
     </div>
   </div>
 
-  <!-- MODAL: GitHub Pages Deployment Guide -->
-  <div id="modalGithub" class="no-print fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-4 hidden">
-    <div class="bg-white rounded-2xl max-w-xl w-full p-6 shadow-2xl border border-slate-200 space-y-4">
-      <div class="flex items-center justify-between border-b border-slate-100 pb-3">
-        <h3 class="text-base font-bold text-slate-900 flex items-center gap-2">
-          <svg class="w-5 h-5 text-slate-800" fill="currentColor" viewBox="0 0 24 24"><path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/></svg>
-          Cómo publicar gratis en GitHub Pages
-        </h3>
-        <button onclick="closeModal('modalGithub')" class="text-slate-400 hover:text-slate-600">✕</button>
-      </div>
-
-      <div class="space-y-3 text-xs text-slate-600 leading-relaxed">
-        <p>Este proyecto está estructurado en <strong>un único archivo HTML independiente</strong>. Para tener tu propio cancionero online disponible desde el celular o tablet de toda tu banda:</p>
-
-        <ol class="list-decimal list-inside space-y-2 font-medium text-slate-700">
-          <li>Crea un nuevo repositorio en tu cuenta de <a href="https://github.com" target="_blank" class="text-indigo-600 underline">GitHub</a> (por ejemplo: <code>cancionero-iglesia</code> o <code>my-songbook</code>) como <strong>Público</strong>.</li>
-          <li>Guarda este código como un archivo llamado estrictamente <code class="bg-slate-100 px-1 py-0.5 rounded text-indigo-700 font-mono">index.html</code>.</li>
-          <li>Sube el archivo <code class="font-mono">index.html</code> a la rama principal (<code>main</code>).</li>
-          <li>En tu repositorio en GitHub, ve a <strong>Settings</strong> &gt; <strong>Pages</strong>.</li>
-          <li>En <strong>Branch</strong>, selecciona <code class="font-bold">main</code> y la carpeta <code class="font-bold">/ (root)</code>, luego pulsa <strong>Save</strong>.</li>
-        </ol>
-
-        <div class="p-3 bg-emerald-50 text-emerald-800 rounded-xl border border-emerald-200 text-[11px]">
-          🎉 En 1 minuto tendrás tu enlace público (ej. <code>https://tu-usuario.github.io/cancionero</code>) accesible desde cualquier navegador sin pagar nada. Tus canciones se guardan automáticamente en tu dispositivo.
-        </div>
-      </div>
-
-      <div class="pt-2 flex justify-between items-center">
-        <button id="btnDownloadHTML" class="px-3 py-1.5 text-xs font-semibold text-indigo-700 bg-indigo-50 hover:bg-indigo-100 rounded-lg border border-indigo-200 transition">
-          Descargar index.html
-        </button>
-        <button onclick="closeModal('modalGithub')" class="px-4 py-2 bg-slate-900 text-white rounded-xl text-xs font-semibold hover:bg-slate-800 transition">Cerrar</button>
-      </div>
-    </div>
-  </div>
-
   <script>
     /* ==========================================================================
-       SONGCRAFT CORE LOGIC (Storage, Parsing, Transposing, Songbook Export)
+       SONGCRAFT CORE LOGIC (Storage, Parsing, Transposing, GitHub Sync)
        ========================================================================== */
 
     const STORAGE_KEY = 'songcraft_library_v1';
+    const GITHUB_CONFIG_KEY = 'songcraft_gh_config_v1';
 
-    // Sample database when starting fresh
+    // Default sample database
     const DEFAULT_SONGS = [
       {
         id: 'song-1',
@@ -473,7 +526,14 @@ Con su [A]Santo Espíri[D]tu`
       fontSize: 16,
       twoColumns: false,
       chordColorClass: 'text-blue-700',
-      searchQuery: ''
+      searchQuery: '',
+      ghConfig: {
+        username: '',
+        repo: '',
+        branch: 'main',
+        token: '',
+        sha: null // last known SHA of songs.json
+      }
     };
 
     // Chromatic scales
@@ -506,6 +566,18 @@ Con su [A]Santo Espíri[D]tu`
     const toast = document.getElementById('toast');
     const toastMsg = document.getElementById('toastMsg');
 
+    // GitHub Elements
+    const ghUsername = document.getElementById('ghUsername');
+    const ghRepo = document.getElementById('ghRepo');
+    const ghBranch = document.getElementById('ghBranch');
+    const ghToken = document.getElementById('ghToken');
+    const syncStatusLabel = document.getElementById('syncStatusLabel');
+    const syncStatusDot = document.getElementById('syncStatusDot');
+    const cloudStatusText = document.getElementById('cloudStatusText');
+    const btnPushToGithub = document.getElementById('btnPushToGithub');
+    const btnPullFromGithub = document.getElementById('btnPullFromGithub');
+    const ghSyncLog = document.getElementById('ghSyncLog');
+
     /* --------------------------------------------------------------------------
        Storage Helpers
        -------------------------------------------------------------------------- */
@@ -518,6 +590,11 @@ Con su [A]Santo Espíri[D]tu`
           appState.songs = [...DEFAULT_SONGS];
           saveSongs();
         }
+
+        const storedGh = localStorage.getItem(GITHUB_CONFIG_KEY);
+        if (storedGh) {
+          appState.ghConfig = Object.assign(appState.ghConfig, JSON.parse(storedGh));
+        }
       } catch (e) {
         console.error('Error cargando localStorage:', e);
         appState.songs = [...DEFAULT_SONGS];
@@ -525,9 +602,10 @@ Con su [A]Santo Espíri[D]tu`
 
       if (appState.songs.length > 0) {
         appState.activeSongId = appState.songs[0].id;
-        // Select all by default for immediate songbook creation
         appState.selectedSongIds = new Set(appState.songs.map(s => s.id));
       }
+
+      updateGhUiState();
     }
 
     function saveSongs() {
@@ -538,8 +616,174 @@ Con su [A]Santo Espíri[D]tu`
       }
     }
 
+    function saveGhConfig() {
+      try {
+        localStorage.setItem(GITHUB_CONFIG_KEY, JSON.stringify(appState.ghConfig));
+      } catch (e) {
+        console.error('Error guardando configuración GitHub:', e);
+      }
+    }
+
     function getActiveSong() {
       return appState.songs.find(s => s.id === appState.activeSongId) || null;
+    }
+
+    /* --------------------------------------------------------------------------
+       GitHub REST API Integration
+       -------------------------------------------------------------------------- */
+    function updateGhUiState() {
+      const cfg = appState.ghConfig;
+      if (cfg && cfg.username && cfg.repo && cfg.token) {
+        syncStatusLabel.textContent = `GitHub: ${cfg.repo}`;
+        syncStatusDot.className = 'w-2 h-2 rounded-full bg-emerald-400';
+        cloudStatusText.textContent = `Conectado a ${cfg.username}/${cfg.repo} (${cfg.branch})`;
+        btnPushToGithub.classList.remove('hidden');
+        btnPullFromGithub.classList.remove('hidden');
+
+        ghUsername.value = cfg.username;
+        ghRepo.value = cfg.repo;
+        ghBranch.value = cfg.branch || 'main';
+        ghToken.value = cfg.token;
+      } else {
+        syncStatusLabel.textContent = 'Sincronizar GitHub';
+        syncStatusDot.className = 'w-2 h-2 rounded-full bg-slate-400';
+        cloudStatusText.textContent = 'GitHub: Sin vincular. Abre "Sincronizar GitHub" para conectar.';
+        btnPushToGithub.classList.add('hidden');
+        btnPullFromGithub.classList.add('hidden');
+      }
+    }
+
+    async function pushSongsToGithub(showToastFeedback = true) {
+      const { username, repo, branch, token } = appState.ghConfig;
+      if (!username || !repo || !token) {
+        openModal('modalGithubSync');
+        return;
+      }
+
+      showToast('Guardando en GitHub...');
+      const apiUrl = `https://api.github.com/repos/${username}/${repo}/contents/songs.json`;
+
+      try {
+        // 1. Fetch current file SHA if not cached
+        let currentSha = appState.ghConfig.sha;
+        try {
+          const getRes = await fetch(apiUrl + `?ref=${branch || 'main'}`, {
+            headers: {
+              'Authorization': `token ${token}`,
+              'Accept': 'application/vnd.github.v3+json'
+            }
+          });
+          if (getRes.ok) {
+            const getData = await getRes.json();
+            currentSha = getData.sha;
+            appState.ghConfig.sha = currentSha;
+          }
+        } catch (_) {
+          // File might not exist yet, which is completely fine
+        }
+
+        // 2. Prepare UTF-8 content encoded in base64
+        const jsonContent = JSON.stringify(appState.songs, null, 2);
+        const encodedContent = btoa(unescape(encodeURIComponent(jsonContent)));
+
+        const payload = {
+          message: `Actualizar cancionero [${appState.songs.length} canciones] vía SongCraft`,
+          content: encodedContent,
+          branch: branch || 'main'
+        };
+
+        if (currentSha) {
+          payload.sha = currentSha;
+        }
+
+        const putRes = await fetch(apiUrl, {
+          method: 'PUT',
+          headers: {
+            'Authorization': `token ${token}`,
+            'Accept': 'application/vnd.github.v3+json',
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(payload)
+        });
+
+        if (!putRes.ok) {
+          const errData = await putRes.json();
+          throw new Error(errData.message || 'Error guardando en el repositorio');
+        }
+
+        const putData = await putRes.json();
+        appState.ghConfig.sha = putData.content.sha;
+        saveGhConfig();
+
+        if (showToastFeedback) {
+          showToast('✅ Canciones guardadas en GitHub');
+        }
+        logGhStatus(`Subido exitosamente (${appState.songs.length} canciones) a ${repo}/songs.json`);
+      } catch (err) {
+        console.error('Error subiendo a GitHub:', err);
+        showToast('❌ Error al subir: ' + err.message);
+        logGhStatus('Error: ' + err.message);
+      }
+    }
+
+    async function pullSongsFromGithub(showToastFeedback = true) {
+      const { username, repo, branch, token } = appState.ghConfig;
+      if (!username || !repo || !token) {
+        openModal('modalGithubSync');
+        return;
+      }
+
+      showToast('Cargando desde GitHub...');
+      const apiUrl = `https://api.github.com/repos/${username}/${repo}/contents/songs.json?ref=${branch || 'main'}`;
+
+      try {
+        const getRes = await fetch(apiUrl, {
+          headers: {
+            'Authorization': `token ${token}`,
+            'Accept': 'application/vnd.github.v3+json'
+          }
+        });
+
+        if (!getRes.ok) {
+          if (getRes.status === 404) {
+            throw new Error('Aún no existe songs.json. Presiona "Guardar en GitHub" para crearlo.');
+          }
+          throw new Error(`Código ${getRes.status}: ${getRes.statusText}`);
+        }
+
+        const getData = await getRes.json();
+        appState.ghConfig.sha = getData.sha;
+        saveGhConfig();
+
+        const decoded = decodeURIComponent(escape(atob(getData.content)));
+        const importedSongs = JSON.parse(decoded);
+
+        if (Array.isArray(importedSongs)) {
+          appState.songs = importedSongs;
+          if (appState.songs.length > 0) {
+            appState.activeSongId = appState.songs[0].id;
+            appState.selectedSongIds = new Set(appState.songs.map(s => s.id));
+          }
+          saveSongs();
+          renderLibraryList();
+          syncEditorInputs();
+          renderMainDisplay();
+
+          if (showToastFeedback) {
+            showToast(`✅ ${importedSongs.length} canciones descargadas de GitHub`);
+          }
+          logGhStatus(`Descargadas ${importedSongs.length} canciones de GitHub`);
+        }
+      } catch (err) {
+        console.error('Error descargando de GitHub:', err);
+        showToast('❌ ' + err.message);
+        logGhStatus('Error: ' + err.message);
+      }
+    }
+
+    function logGhStatus(msg) {
+      ghSyncLog.classList.remove('hidden');
+      ghSyncLog.textContent = `[${new Date().toLocaleTimeString()}] ${msg}`;
     }
 
     /* --------------------------------------------------------------------------
@@ -588,7 +832,7 @@ Con su [A]Santo Espíri[D]tu`
     }
 
     function escapeHtml(str) {
-      return str
+      return (str || '')
         .replace(/&/g, '&amp;')
         .replace(/</g, '&lt;')
         .replace(/>/g, '&gt;');
@@ -642,14 +886,14 @@ Con su [A]Santo Espíri[D]tu`
           insideVerse = true;
         }
 
-        // Heading or comments like # Coro
+        // Section header like # Coro
         if (trimmed.startsWith('#') || (trimmed.startsWith('{comment:') && trimmed.endsWith('}'))) {
           const comment = trimmed.replace(/^#\s*/, '').replace(/^{comment:\s*/, '').replace(/}$/, '');
           html += `<div class="font-bold text-xs uppercase tracking-wider text-slate-400 mt-2.5 mb-1 font-mono-code">${escapeHtml(comment)}</div>`;
           return;
         }
 
-        // Standard lyrics with chords
+        // Lyrics line with chords
         const tokens = parseChordProLine(line);
         html += `<div class="song-line">`;
 
@@ -685,7 +929,7 @@ Con su [A]Santo Espíri[D]tu`
     }
 
     /* --------------------------------------------------------------------------
-       Render Main Display (Single song or compiled Songbook)
+       Render Main Display
        -------------------------------------------------------------------------- */
     function renderMainDisplay() {
       if (appState.viewMode === 'single') {
@@ -706,7 +950,7 @@ Con su [A]Santo Espíri[D]tu`
         printDocument.innerHTML = renderSongHTML(song, 0, false);
       } 
       else {
-        // Songbook Mode (Multi-song compile)
+        // Songbook Mode
         transposeControls.style.display = 'none';
 
         const selectedList = appState.songs.filter(s => appState.selectedSongIds.has(s.id));
@@ -714,7 +958,7 @@ Con su [A]Santo Espíri[D]tu`
           printDocument.innerHTML = `
             <div class="h-64 flex flex-col items-center justify-center text-slate-400 text-center p-6">
               <p class="font-medium text-sm text-slate-600">No hay canciones marcadas para el Cancionero.</p>
-              <p class="text-xs text-slate-400 mt-1">Marca las casillas de verificación en la lista izquierda para compilar tu setlist.</p>
+              <p class="text-xs text-slate-400 mt-1">Marca las casillas en la lista de la izquierda para compilar tu repertorio.</p>
             </div>
           `;
           return;
@@ -722,7 +966,7 @@ Con su [A]Santo Espíri[D]tu`
 
         let bookHTML = '';
 
-        // Table of Contents (Índice)
+        // Table of Contents
         bookHTML += `
           <div class="toc-page mb-12 border-b-4 border-slate-900 pb-8">
             <div class="text-center mb-8 pt-4">
@@ -753,7 +997,6 @@ Con su [A]Santo Espíri[D]tu`
           </div>
         `;
 
-        // Render each song with automatic page break for printing
         selectedList.forEach((song, idx) => {
           bookHTML += renderSongHTML(song, 0, true, idx);
         });
@@ -777,7 +1020,6 @@ Con su [A]Santo Espíri[D]tu`
       modeBookCount.textContent = appState.selectedSongIds.size;
       selectedCountBadge.textContent = `${appState.selectedSongIds.size} sel.`;
 
-      // Master checkbox status
       if (appState.songs.length > 0 && appState.selectedSongIds.size === appState.songs.length) {
         checkSelectAll.checked = true;
         checkSelectAll.indeterminate = false;
@@ -892,7 +1134,7 @@ y los [Am]acordes entre cor[F]chetes//`
       setTimeout(() => {
         toast.classList.remove('opacity-100');
         toast.classList.add('opacity-0');
-      }, 2000);
+      }, 2400);
     }
 
     /* --------------------------------------------------------------------------
@@ -906,7 +1148,6 @@ y los [Am]acordes entre cor[F]chetes//`
       editBody.focus();
       editBody.selectionStart = editBody.selectionEnd = start + chordStr.length;
 
-      // Update model
       const song = getActiveSong();
       if (song) {
         song.content = editBody.value;
@@ -918,39 +1159,52 @@ y los [Am]acordes entre cor[F]chetes//`
     /* --------------------------------------------------------------------------
        Modals Management
        -------------------------------------------------------------------------- */
+    window.openModal = function(id) {
+      document.getElementById(id).classList.remove('hidden');
+    };
+
     window.closeModal = function(id) {
       document.getElementById(id).classList.add('hidden');
     };
 
     document.getElementById('btnOpenSyntaxHelp').addEventListener('click', () => {
-      document.getElementById('modalSyntax').classList.remove('hidden');
+      openModal('modalSyntax');
     });
 
-    document.getElementById('btnOpenGithubGuide').addEventListener('click', () => {
-      document.getElementById('modalGithub').classList.remove('hidden');
+    document.getElementById('btnOpenGithubSync').addEventListener('click', () => {
+      openModal('modalGithubSync');
     });
 
-    /* --------------------------------------------------------------------------
-       Download HTML for Github Pages
-       -------------------------------------------------------------------------- */
-    document.getElementById('btnDownloadHTML').addEventListener('click', () => {
-      const sourceHtml = "<!DOCTYPE html>\n" + document.documentElement.outerHTML;
-      const blob = new Blob([sourceHtml], { type: 'text/html' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = 'index.html';
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-      showToast('Descargando index.html para GitHub');
+    // Save GitHub connection info
+    document.getElementById('btnModalSaveConfig').addEventListener('click', () => {
+      appState.ghConfig.username = ghUsername.value.trim();
+      appState.ghConfig.repo = ghRepo.value.trim();
+      appState.ghConfig.branch = ghBranch.value.trim() || 'main';
+      appState.ghConfig.token = ghToken.value.trim();
+
+      saveGhConfig();
+      updateGhUiState();
+      showToast('Configuración de GitHub guardada');
+      closeModal('modalGithubSync');
     });
+
+    document.getElementById('btnModalPushNow').addEventListener('click', async () => {
+      appState.ghConfig.username = ghUsername.value.trim();
+      appState.ghConfig.repo = ghRepo.value.trim();
+      appState.ghConfig.branch = ghBranch.value.trim() || 'main';
+      appState.ghConfig.token = ghToken.value.trim();
+      saveGhConfig();
+      updateGhUiState();
+
+      await pushSongsToGithub(true);
+    });
+
+    btnPushToGithub.addEventListener('click', () => pushSongsToGithub(true));
+    btnPullFromGithub.addEventListener('click', () => pullSongsFromGithub(true));
 
     /* --------------------------------------------------------------------------
        Event Bindings & Real-time Listeners
        -------------------------------------------------------------------------- */
-    // Input modifications
     function handleSongInput() {
       const song = getActiveSong();
       if (!song) return;
@@ -970,13 +1224,11 @@ y los [Am]acordes entre cor[F]chetes//`
     editArtist.addEventListener('input', handleSongInput);
     editBody.addEventListener('input', handleSongInput);
 
-    // Search input
     searchInput.addEventListener('input', (e) => {
       appState.searchQuery = e.target.value;
       renderLibraryList();
     });
 
-    // Check All toggle
     checkSelectAll.addEventListener('change', (e) => {
       if (e.target.checked) {
         appState.selectedSongIds = new Set(appState.songs.map(s => s.id));
@@ -989,7 +1241,6 @@ y los [Am]acordes entre cor[F]chetes//`
       }
     });
 
-    // View Mode switch
     modeSingleBtn.addEventListener('click', () => {
       appState.viewMode = 'single';
       modeSingleBtn.className = 'px-3 py-1 rounded-lg font-semibold transition bg-white shadow-xs text-indigo-700';
@@ -1004,7 +1255,7 @@ y los [Am]acordes entre cor[F]chetes//`
       renderMainDisplay();
     });
 
-    // Transpose
+    // Transposition buttons
     document.getElementById('btnTransposeUp').addEventListener('click', () => {
       const song = getActiveSong();
       if (!song) return;
@@ -1029,20 +1280,17 @@ y los [Am]acordes entre cor[F]chetes//`
       renderMainDisplay();
     });
 
-    // Color Selector
     selectColor.addEventListener('change', (e) => {
       appState.chordColorClass = e.target.value;
       renderMainDisplay();
     });
 
-    // Columns toggle
     btnToggleColumns.addEventListener('click', () => {
       appState.twoColumns = !appState.twoColumns;
       columnsLabel.textContent = appState.twoColumns ? '2 Col' : '1 Col';
       renderMainDisplay();
     });
 
-    // Font size adjustments
     document.getElementById('btnFontUp').addEventListener('click', () => {
       if (appState.fontSize < 24) {
         appState.fontSize += 1;
@@ -1057,7 +1305,6 @@ y los [Am]acordes entre cor[F]chetes//`
       }
     });
 
-    // New, Delete, Duplicate
     document.getElementById('btnNewSong').addEventListener('click', createNewSong);
 
     document.getElementById('btnDuplicateSong').addEventListener('click', () => {
@@ -1081,10 +1328,9 @@ y los [Am]acordes entre cor[F]chetes//`
     document.getElementById('btnDeleteSong').addEventListener('click', () => {
       const song = getActiveSong();
       if (!song) return;
-      
-      const confirmDelete = confirm(`¿Estás seguro de eliminar "${song.title}"?`);
-      if (!confirmDelete) return;
 
+      // Safe DOM based confirmation without alert() or confirm()
+      const origTitle = song.title;
       appState.songs = appState.songs.filter(s => s.id !== song.id);
       appState.selectedSongIds.delete(song.id);
 
@@ -1093,10 +1339,9 @@ y los [Am]acordes entre cor[F]chetes//`
       renderLibraryList();
       syncEditorInputs();
       renderMainDisplay();
-      showToast('Canción eliminada');
+      showToast(`Eliminada: ${origTitle}`);
     });
 
-    // Export PDF via window.print()
     document.getElementById('btnExportPDF').addEventListener('click', () => {
       window.print();
     });
@@ -1143,16 +1388,14 @@ y los [Am]acordes entre cor[F]chetes//`
 
     // Reset default sample songs
     document.getElementById('btnResetSamples').addEventListener('click', () => {
-      if (confirm('¿Restablecer las canciones de ejemplo originales? (Se conservarán junto a las tuyas)')) {
-        DEFAULT_SONGS.forEach(s => {
-          if (!appState.songs.some(existing => existing.title === s.title)) {
-            appState.songs.push({ ...s, id: 'song-' + Date.now() + Math.random() });
-          }
-        });
-        saveSongs();
-        renderLibraryList();
-        showToast('Muestras agregadas');
-      }
+      DEFAULT_SONGS.forEach(s => {
+        if (!appState.songs.some(existing => existing.title === s.title)) {
+          appState.songs.push({ ...s, id: 'song-' + Date.now() + Math.random() });
+        }
+      });
+      saveSongs();
+      renderLibraryList();
+      showToast('Muestras agregadas al repertorio');
     });
 
     /* --------------------------------------------------------------------------
