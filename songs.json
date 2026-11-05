@@ -1,11 +1,27 @@
 [
   {
-    "id": "song-1793839899158",
+    "id": "song-1793840659051",
     "title": "Nueva Canción",
     "artist": "",
     "key": "C",
     "transpose": 0,
     "content": "//[C]Escribe aquí la primera [G]línea\ny los [Am]acordes entre cor[F]chetes//"
+  },
+  {
+    "id": "song-1793840288940",
+    "title": "Los que esperan en Jehová",
+    "artist": "",
+    "key": "Am",
+    "transpose": 0,
+    "content": "Los que es[Am]peran, los que esperan en Jeho[E]vá\nLos que esperan, los que esperan en Jeho[Am]vá\n//Como las [Dm]águilas, como las [Am]águilas, sus [E]alas\nlevanta[Am]rán//\nCorre[G]rán y no se cansa[C]rán, Camina[G]rán, no se fatiga[C]rán\n//Nuevas fu[Dm]erzas tendrán, Nuevas fu[Am]erzas tendrán\nLos que esp[E]eran, los que esperan en Jeho[Am]vá//"
+  },
+  {
+    "id": "song-1793839899158",
+    "title": "Cuando el pueblo del Señor alaba a Dios",
+    "artist": "",
+    "key": "Bm",
+    "transpose": 0,
+    "content": "//Cuando el [Bm]pueblo del Señor alaba a Dios,\nsuceden [F#]cosas, suceden cosas, maravi[Bm]llosas//\n\n//Hay sani[Em]dad, libera[Bm]ción,\nse [F#]siente la presencia del Se[Bm]ñor//\n\n//Y a[Bm]quí se s[F#]iente la presencia de [Bm]Dios//\n//Se siente el [Em]fuego del [A]Espíritu S[D]anto //\n\n//[Bm]Siento gozo, [F#]siento paz,\nsiento el amor que [Bm]Dios me da//\n//Y a[Bm]quí se s[F#]iente la presencia de [Bm]Dios//"
   },
   {
     "id": "song-1793839301363",
