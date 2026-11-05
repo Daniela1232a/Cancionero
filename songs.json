@@ -1,11 +1,59 @@
 [
   {
-    "id": "song-1793840659051",
-    "title": "Nueva Canción",
+    "id": "song-1793914392733",
+    "title": "Quién como Jehová",
     "artist": "",
     "key": "C",
     "transpose": 0,
-    "content": "m"
+    "content": "//[Bm]Quién, quién, quién como Jehová\nQue con [A]su poder el mar a[Bm]brió//\nO[Em]irán las naciones lo que [Bm] hizo\nTembla[Em]rán al saber de sus pro[Bm]digios\nSu pueblo le alabará, con pandero danzará\n//Y di[A]rán quién, quién como Jeho[Bm]vá//"
+  },
+  {
+    "id": "song-1793914185751",
+    "title": "Así como David danzaba",
+    "artist": "",
+    "key": "Bm",
+    "transpose": 0,
+    "content": "//A[Bm]sí como David danzaba\nA[A]sí como David cantaba\n[Em]Así como David fluía en Su pre[F#]sencia//\n\n//Yo canta[Bm]ré, (yo cantaré) Yo danzaré (yo danzaré)\nEn tu pre[A]sencia, me gozaré\nY solo en [Em]Ti (y solo en Ti) me alegraré (me alegraré)\nPorque Tú [F#]eres mi Dios y mi Rey//"
+  },
+  {
+    "id": "song-1793914102378",
+    "title": "Me gozaré",
+    "artist": "",
+    "key": "Bm",
+    "transpose": 0,
+    "content": "//Me goza[Bm]ré, gozaré, gozaré, me gozaré en Jeho[A]vá\nPues ha lle[Em]vado todo mi dolor, Me ha hecho [F#]libre//"
+  },
+  {
+    "id": "song-1793913537353",
+    "title": "Cuando el Señor hiciere volver la cautividad",
+    "artist": "",
+    "key": "Bm",
+    "transpose": 0,
+    "content": "//Cuando el Se[Bm]ñor hiciere volver la cautivid[A]ad\nSeremos [Em]como los que sue[F#]ñan//\n//Mi [Bm]boca llenará de risa, Mis [A]labios, de alabanza\nEn[Em]tonces dirán las naciones: Grandes [F#]cosas, ha hecho el Señor//"
+  },
+  {
+    "id": "song-1793912718249",
+    "title": "Haré un altar para ti",
+    "artist": "",
+    "key": "Am",
+    "transpose": 0,
+    "content": "[Am]Haré un altar para ti,   ([A]Pa[B]ra [C#]ti, para ti)\n[Dm]Con sacrificio de ala[Am]banza\n[Dm]Con júbilo y [Am]danza\nY cantar[E]é a Jeho[Am]vá\n\n//Desciende el [Dm]fuego\nDesciende el [Am]fuego\nDesciende el f[E]uego de [Am]Dios//"
+  },
+  {
+    "id": "song-1793912410218",
+    "title": "Gózate delante del Señor",
+    "artist": "",
+    "key": "Am",
+    "transpose": 0,
+    "content": "//[Am]Gózate delante del Señor\nPorque Él [G]es tu [Am]Rey//\nÉl [Am]es, Él [C]es, Él [Dm]es, Él [F]es, Tu [Am]Rey\n\n//[Am]Gózate delante del Señor\nPorque Él [G]es tu [Am]roca//\nÉl [Am]es, Él [C]es, Él [Dm]es, Él [F]es, Tu [Am]roca\n\n//[Am]Gózate delante del Señor\nPorque Él [G]es tu es[Am]cudo//\nÉl [Am]es, Él [C]es, Él [Dm]es, Él [F]es, Tu es[Am]cudo"
+  },
+  {
+    "id": "song-1793840659051",
+    "title": "Maravilloso es el Señor Jesús",
+    "artist": "",
+    "key": "Am",
+    "transpose": 0,
+    "content": "[Am]//Maravilloso es el Se[G]ñor Jesús\nQue r[F]eina con pod[E]er, poder// poder, poder\n//Él es mi [Dm]rey, él es mi r[Am]ey\nY en su c[E]asa danza[Am]ré//"
   },
   {
     "id": "song-1793840288940",
