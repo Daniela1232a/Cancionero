@@ -62,14 +62,22 @@
     /* Multi-column layouts */
     .song-columns-2 {
       column-count: 2;
-      column-gap: 2.5rem;
+      column-gap: 2.25rem;
+      column-fill: balance;
+    }
+
+    /* Compact Songbook Block (prevents splitting a single short chorus across columns if possible) */
+    .compact-song-block {
+      break-inside: avoid;
+      page-break-inside: avoid;
+      margin-bottom: 1.35rem;
     }
 
     /* Print Styles for PDF Export */
     @media print {
       @page {
         size: letter portrait;
-        margin: 1.5cm 1.2cm 1.5cm 1.2cm;
+        margin: 1cm 1cm 1cm 1cm;
       }
       body {
         background: #ffffff !important;
@@ -109,6 +117,10 @@
       .verse-block {
         page-break-inside: avoid;
         break-inside: avoid;
+      }
+      .compact-song-block {
+        break-inside: avoid;
+        page-break-inside: avoid;
       }
     }
   </style>
@@ -332,19 +344,25 @@
         </div>
 
         <!-- Sheet Display Settings -->
-        <div class="flex items-center gap-2">
+        <div class="flex items-center gap-2 flex-wrap">
+          <!-- Toggle Show/Hide Headers & Titles -->
+          <button id="btnToggleHeaders" class="px-2.5 py-1 rounded-lg border border-slate-200 bg-slate-50 hover:bg-slate-100 font-semibold text-slate-700 flex items-center gap-1 transition" title="Mostrar u ocultar títulos, índice y saltos de página">
+            <svg class="w-3.5 h-3.5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7"/></svg>
+            <span id="headersLabel">Sin Títulos</span>
+          </button>
+
           <!-- Chord Color -->
           <select id="selectColor" class="bg-slate-50 border border-slate-200 rounded-lg px-2 py-1 text-xs font-semibold focus:outline-none">
-            <option value="text-blue-700" selected>Azul</option>
+            <option value="text-slate-900" selected>Negro Partitura</option>
+            <option value="text-blue-700">Azul</option>
             <option value="text-indigo-600">Índigo</option>
             <option value="text-red-700">Rojo</option>
-            <option value="text-slate-900">Negro Partitura</option>
           </select>
 
           <!-- Columns toggle -->
-          <button id="btnToggleColumns" class="px-2.5 py-1 rounded-lg border border-slate-200 hover:bg-slate-50 font-medium text-slate-700 flex items-center gap-1" title="Alternar 1 o 2 columnas">
-            <svg class="w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 4v16m6-16v16"/></svg>
-            <span id="columnsLabel">1 Col</span>
+          <button id="btnToggleColumns" class="px-2.5 py-1 rounded-lg border border-indigo-200 bg-indigo-50 hover:bg-indigo-100 font-semibold text-indigo-700 flex items-center gap-1 transition" title="Alternar 1 o 2 columnas">
+            <svg class="w-3.5 h-3.5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 4v16m6-16v16"/></svg>
+            <span id="columnsLabel">2 Col</span>
           </button>
 
           <!-- Font Size Slider -->
@@ -388,144 +406,17 @@
 
         <div class="grid grid-cols-2 gap-3">
           <div>
-            <label class="block text-[11px] font-bold text-slate-600 mb-1">Nombre del Repositorio</label>
-            <input id="ghRepo" type="text" class="w-full text-xs px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 font-mono" placeholder="Cancionero">
-          </div>
-          <div>
-            <label class="block text-[11px] font-bold text-slate-600 mb-1">Rama (Branch)</label>
-            <input id="ghBranch" type="text" value="main" class="w-full text-xs px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 font-mono">
-          </div>
-        </div>
-
-        <div>
-          <label class="block text-[11px] font-bold text-slate-600 mb-1">
-            Personal Access Token (classic)
-            <span class="text-slate-400 font-normal ml-1">(con permiso <code>repo</code>)</span>
-          </label>
-          <input id="ghToken" type="password" class="w-full text-xs px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 font-mono" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx">
-          <p class="text-[10px] text-slate-400 mt-1">Tu token se guarda únicamente en este navegador y viaja seguro mediante HTTPS hacia la API de GitHub.</p>
-        </div>
-      </div>
-
-      <!-- Action buttons inside modal -->
-      <div class="pt-3 border-t border-slate-100 flex flex-wrap items-center justify-between gap-2">
-        <div class="flex items-center gap-2">
-          <button id="btnModalSaveConfig" class="px-4 py-2 bg-indigo-600 text-white rounded-xl text-xs font-semibold hover:bg-indigo-700 transition">
-            Guardar Conexión
-          </button>
-          <button id="btnModalPushNow" class="px-3 py-2 bg-emerald-600 text-white rounded-xl text-xs font-semibold hover:bg-emerald-700 transition">
-            Subir canciones ahora
-          </button>
-        </div>
-
-        <button onclick="closeModal('modalGithubSync')" class="px-3 py-2 text-xs text-slate-500 hover:text-slate-800 transition">
-          Cerrar
-        </button>
-      </div>
-
-      <!-- Sync feedback log -->
-      <div id="ghSyncLog" class="p-2.5 bg-slate-50 rounded-lg border border-slate-200 text-[11px] font-mono text-slate-600 hidden">
-      </div>
-    </div>
-  </div>
-
-  <!-- MODAL: Syntax Help Guide -->
-  <div id="modalSyntax" class="no-print fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-4 hidden">
-    <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-slate-200 space-y-4">
-      <div class="flex items-center justify-between border-b border-slate-100 pb-3">
-        <h3 class="text-base font-bold text-slate-900 flex items-center gap-2">
-          <span class="p-1.5 bg-indigo-50 text-indigo-600 rounded-lg">🎵</span>
-          Formato de Cifrado (ChordPro)
-        </h3>
-        <button onclick="closeModal('modalSyntax')" class="text-slate-400 hover:text-slate-600">✕</button>
-      </div>
-
-      <div class="space-y-3 text-xs text-slate-600 leading-relaxed">
-        <p>Escribe la letra con total normalidad e introduce el acorde entre corchetes <code>[Acorde]</code> <strong>justo antes</strong> de la letra o sílaba donde debe sonar.</p>
-
-        <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 font-mono-code text-[11px] space-y-1">
-          <p class="text-slate-400">// Ejemplo directo:</p>
-          <p class="text-indigo-700 font-semibold">//[G]No hay Dios que pueda hacer las [D]obras</p>
-          <p class="text-indigo-700 font-semibold">como las que [A]haces tú// [D]</p>
-        </div>
-
-        <ul class="list-disc list-inside space-y-1">
-          <li><strong>Secciones:</strong> Escribe <code># Coro</code>, <code># Estrofa 1</code> o <code># Puente</code> para resaltar títulos de sección.</li>
-          <li><strong>Acordes al aire:</strong> Si un acorde va al final sin letra debajo, ponlo con un espacio: <code>tú// [D]</code>.</li>
-          <li><strong>Transposición:</strong> Cambia de tono en tiempo real (+1 / -1 semitono) sin alterar tu texto original.</li>
-        </ul>
-      </div>
-
-      <div class="pt-2 flex justify-end">
-        <button onclick="closeModal('modalSyntax')" class="px-4 py-2 bg-indigo-600 text-white rounded-xl text-xs font-semibold hover:bg-indigo-700 transition">Entendido</button>
-      </div>
-    </div>
-  </div>
-
-  <script>
-    /* ==========================================================================
-       SONGCRAFT CORE LOGIC (Storage, Parsing, Transposing, GitHub Sync)
-       ========================================================================== */
-
-    const STORAGE_KEY = 'songcraft_library_v1';
-    const GITHUB_CONFIG_KEY = 'songcraft_gh_config_v1';
-
-    // Default sample database
-    const DEFAULT_SONGS = [
-      {
-        id: 'song-1',
-        title: 'Los hijos de Sión',
-        artist: 'Tradicional / Alabanza',
-        key: 'C',
-        transpose: 0,
-        content: `//Los [C]hijos de Sión, se [F]gozan en su [C]Rey
-Se gozan en su Rey can[G]tando
-Con pan[C]deros y arpas, [F]cantan alabanzas
-[C]Cantan ala[G]banzas al [C]rey //
-
-# Coro
-//[C]Aleluya, [F]ale[C]luya, [F]ale[C]luya,
-[G]am[C]én//`
-      },
-      {
-        id: 'song-2',
-        title: 'No hay Dios que pueda hacer las obras',
-        artist: 'Inspiración',
-        key: 'D',
-        transpose: 0,
-        content: `//No hay [G]Dios que pueda hacer las [D]obras
-como las que [A]haces tú // [D]
-
-# Coro
-//No es con [D]espada, ni con ejércitos
-mas con su [A]Santo Espíri[D]tu//
-
-Y esas [G]almas se salvarán [D]
-Y esas [A]almas se salvarán [D]
-Con su [A]Santo Espíri[D]tu`
-      },
-      {
-        id: 'song-3',
-        title: 'Tu Fidelidad',
-        artist: 'Marcos Witt',
-        key: 'D',
-        transpose: 0,
-        content: `[D]Tu fidelidad es [Em]grande
-[A]tu fidelidad incompa[D]rable es
-[Bm]nadie como tú, ben[Em]dito Dios
-[A]grande es tu fideli[D]dad`
-      }
-    ];
 
     // Global application state
     let appState = {
       songs: [],
       activeSongId: null,
       selectedSongIds: new Set(),
-      viewMode: 'single', // 'single' | 'book'
-      fontSize: 16,
-      twoColumns: false,
-      chordColorClass: 'text-blue-700',
+      viewMode: 'book', // Default to Songbook ('book' | 'single') so user sees the 2-col sheet right away
+      fontSize: 13,
+      twoColumns: true, // Default 2 columns like a chorus sheet
+      showHeaders: false, // Default compact mode without song titles, TOC, or page breaks
+      chordColorClass: 'text-slate-900',
       searchQuery: '',
       ghConfig: {
         username: '',
@@ -562,6 +453,8 @@ Con su [A]Santo Espíri[D]tu`
     const selectColor = document.getElementById('selectColor');
     const btnToggleColumns = document.getElementById('btnToggleColumns');
     const columnsLabel = document.getElementById('columnsLabel');
+    const btnToggleHeaders = document.getElementById('btnToggleHeaders');
+    const headersLabel = document.getElementById('headersLabel');
 
     const toast = document.getElementById('toast');
     const toastMsg = document.getElementById('toastMsg');
@@ -841,32 +734,9 @@ Con su [A]Santo Espíri[D]tu`
     /* --------------------------------------------------------------------------
        Song HTML Renderer
        -------------------------------------------------------------------------- */
-    function renderSongHTML(song, transposeOffset = 0, isPartOfBook = false, songIndex = null) {
-      const semitones = (song.transpose || 0) + transposeOffset;
+    function renderSongLinesHTML(song, semitones) {
       const lines = (song.content || '').split('\n');
-      
       let html = '';
-      html += `<article class="song-sheet mb-10 ${isPartOfBook ? 'song-page-break' : ''}">`;
-
-      // Header of the sheet
-      html += `
-        <header class="border-b-2 border-slate-900 pb-3 mb-6 flex justify-between items-end">
-          <div>
-            ${isPartOfBook && songIndex !== null ? `<span class="text-xs font-bold text-indigo-600 block mb-0.5">Canción #${songIndex + 1}</span>` : ''}
-            <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight leading-tight">${escapeHtml(song.title || 'Sin Título')}</h2>
-            <div class="flex items-center gap-3 mt-1 text-xs text-slate-500 font-medium">
-              ${song.artist ? `<span>Autor: <strong class="text-slate-700">${escapeHtml(song.artist)}</strong></span>` : ''}
-              ${song.key ? `<span>• Tono original: <strong class="text-slate-700">${escapeHtml(song.key)}</strong></span>` : ''}
-              ${semitones !== 0 ? `<span class="bg-amber-100 text-amber-800 px-1.5 py-0.2 rounded font-bold">Transp: ${semitones > 0 ? '+' : ''}${semitones} semitono(s)</span>` : ''}
-            </div>
-          </div>
-        </header>
-      `;
-
-      // Body lines
-      const columnClass = appState.twoColumns ? 'song-columns-2' : '';
-      html += `<div class="${columnClass}" style="font-size: ${appState.fontSize}px;">`;
-
       let insideVerse = false;
 
       lines.forEach((line) => {
@@ -877,7 +747,7 @@ Con su [A]Santo Espíri[D]tu`
             html += `</div>`;
             insideVerse = false;
           }
-          html += `<div class="h-4"></div>`;
+          html += `<div class="h-2.5"></div>`;
           return;
         }
 
@@ -888,8 +758,9 @@ Con su [A]Santo Espíri[D]tu`
 
         // Section header like # Coro
         if (trimmed.startsWith('#') || (trimmed.startsWith('{comment:') && trimmed.endsWith('}'))) {
+          if (!appState.showHeaders) return;
           const comment = trimmed.replace(/^#\s*/, '').replace(/^{comment:\s*/, '').replace(/}$/, '');
-          html += `<div class="font-bold text-xs uppercase tracking-wider text-slate-400 mt-2.5 mb-1 font-mono-code">${escapeHtml(comment)}</div>`;
+          html += `<div class="font-bold text-[11px] uppercase tracking-wider text-slate-400 mt-1.5 mb-0.5 font-mono-code">${escapeHtml(comment)}</div>`;
           return;
         }
 
@@ -922,7 +793,42 @@ Con su [A]Santo Espíri[D]tu`
         html += `</div>`;
       }
 
-      html += `</div>`; // Close columns container
+      return html;
+    }
+
+    function renderSongHTML(song, transposeOffset = 0, isPartOfBook = false, songIndex = null) {
+      const semitones = (song.transpose || 0) + transposeOffset;
+
+      // Compact mode (No titles, no headers, no page breaks)
+      if (!appState.showHeaders) {
+        let html = `<article class="compact-song-block" style="font-size: ${appState.fontSize}px;">`;
+        html += renderSongLinesHTML(song, semitones);
+        html += `</article>`;
+        return html;
+      }
+
+      // Full header mode (with titles, key, artist, and page breaks when in book mode)
+      let html = '';
+      html += `<article class="song-sheet mb-8 ${isPartOfBook ? 'song-page-break' : ''}">`;
+
+      html += `
+        <header class="border-b-2 border-slate-900 pb-2.5 mb-5 flex justify-between items-end">
+          <div>
+            ${isPartOfBook && songIndex !== null ? `<span class="text-xs font-bold text-indigo-600 block mb-0.5">Canción #${songIndex + 1}</span>` : ''}
+            <h2 class="text-2xl font-extrabold text-slate-900 tracking-tight leading-tight">${escapeHtml(song.title || 'Sin Título')}</h2>
+            <div class="flex items-center gap-3 mt-1 text-xs text-slate-500 font-medium">
+              ${song.artist ? `<span>Autor: <strong class="text-slate-700">${escapeHtml(song.artist)}</strong></span>` : ''}
+              ${song.key ? `<span>• Tono original: <strong class="text-slate-700">${escapeHtml(song.key)}</strong></span>` : ''}
+              ${semitones !== 0 ? `<span class="bg-amber-100 text-amber-800 px-1.5 py-0.2 rounded font-bold">Transp: ${semitones > 0 ? '+' : ''}${semitones} semitono(s)</span>` : ''}
+            </div>
+          </div>
+        </header>
+      `;
+
+      const columnClass = (!isPartOfBook && appState.twoColumns) ? 'song-columns-2' : '';
+      html += `<div class="${columnClass}" style="font-size: ${appState.fontSize}px;">`;
+      html += renderSongLinesHTML(song, semitones);
+      html += `</div>`;
       html += `</article>`;
 
       return html;
@@ -932,6 +838,15 @@ Con su [A]Santo Espíri[D]tu`
        Render Main Display
        -------------------------------------------------------------------------- */
     function renderMainDisplay() {
+      // Sync mode buttons visual state
+      if (appState.viewMode === 'single') {
+        modeSingleBtn.className = 'px-3 py-1 rounded-lg font-semibold transition bg-white shadow-xs text-indigo-700';
+        modeBookBtn.className = 'px-3 py-1 rounded-lg font-semibold transition text-slate-600 hover:text-slate-900';
+      } else {
+        modeBookBtn.className = 'px-3 py-1 rounded-lg font-semibold transition bg-white shadow-xs text-indigo-700';
+        modeSingleBtn.className = 'px-3 py-1 rounded-lg font-semibold transition text-slate-600 hover:text-slate-900';
+      }
+
       if (appState.viewMode === 'single') {
         const song = getActiveSong();
         if (!song) {
@@ -947,7 +862,8 @@ Con su [A]Santo Espíri[D]tu`
 
         transposeControls.style.display = 'flex';
         transposeDisplay.textContent = (song.transpose > 0 ? `+${song.transpose}` : `${song.transpose || 0}`);
-        printDocument.innerHTML = renderSongHTML(song, 0, false);
+        const wrapperColClass = (!appState.showHeaders && appState.twoColumns) ? 'song-columns-2' : '';
+        printDocument.innerHTML = `<div class="${wrapperColClass}">${renderSongHTML(song, 0, false)}</div>`;
       } 
       else {
         // Songbook Mode
@@ -966,40 +882,48 @@ Con su [A]Santo Espíri[D]tu`
 
         let bookHTML = '';
 
-        // Table of Contents
-        bookHTML += `
-          <div class="toc-page mb-12 border-b-4 border-slate-900 pb-8">
-            <div class="text-center mb-8 pt-4">
-              <h1 class="text-3xl font-extrabold uppercase tracking-widest text-slate-900">Repertorio Musical</h1>
-              <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider mt-1">Compilado con SongCraft • ${selectedList.length} Canciones</p>
-            </div>
-            
-            <div class="max-w-xl mx-auto">
-              <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-3 border-b border-slate-200 pb-1">Índice de Canciones</h3>
-              <div class="divide-y divide-slate-100">
-        `;
-
-        selectedList.forEach((song, idx) => {
+        // Only include Table of Contents when headers/titles are explicitly enabled
+        if (appState.showHeaders) {
           bookHTML += `
-            <div class="py-2 flex items-center justify-between text-sm">
-              <div class="flex items-center gap-2">
-                <span class="font-mono text-xs font-bold text-indigo-600 w-6">${idx + 1}.</span>
-                <span class="font-semibold text-slate-800">${escapeHtml(song.title)}</span>
+            <div class="toc-page mb-12 border-b-4 border-slate-900 pb-8">
+              <div class="text-center mb-8 pt-4">
+                <h1 class="text-3xl font-extrabold uppercase tracking-widest text-slate-900">Repertorio Musical</h1>
+                <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider mt-1">Compilado con SongCraft • ${selectedList.length} Canciones</p>
               </div>
-              <span class="text-xs font-mono text-slate-500 bg-slate-100 px-2 py-0.5 rounded">${escapeHtml(song.key || 'Tono')}</span>
+              
+              <div class="max-w-xl mx-auto">
+                <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-3 border-b border-slate-200 pb-1">Índice de Canciones</h3>
+                <div class="divide-y divide-slate-100">
+          `;
+
+          selectedList.forEach((song, idx) => {
+            bookHTML += `
+              <div class="py-2 flex items-center justify-between text-sm">
+                <div class="flex items-center gap-2">
+                  <span class="font-mono text-xs font-bold text-indigo-600 w-6">${idx + 1}.</span>
+                  <span class="font-semibold text-slate-800">${escapeHtml(song.title)}</span>
+                </div>
+                <span class="text-xs font-mono text-slate-500 bg-slate-100 px-2 py-0.5 rounded">${escapeHtml(song.key || 'Tono')}</span>
+              </div>
+            `;
+          });
+
+          bookHTML += `
+                </div>
+              </div>
             </div>
           `;
-        });
+        }
 
-        bookHTML += `
-              </div>
-            </div>
-          </div>
-        `;
+        // Wrapper applies multi-column layout directly across all selected songs when in compact mode
+        const bookColumnsClass = (!appState.showHeaders && appState.twoColumns) ? 'song-columns-2' : '';
+        bookHTML += `<div class="${bookColumnsClass}">`;
 
         selectedList.forEach((song, idx) => {
           bookHTML += renderSongHTML(song, 0, true, idx);
         });
+
+        bookHTML += `</div>`;
 
         printDocument.innerHTML = bookHTML;
       }
@@ -1243,8 +1167,25 @@ y los [Am]acordes entre cor[F]chetes//`
 
     modeSingleBtn.addEventListener('click', () => {
       appState.viewMode = 'single';
-      modeSingleBtn.className = 'px-3 py-1 rounded-lg font-semibold transition bg-white shadow-xs text-indigo-700';
-      modeBookBtn.className = 'px-3 py-1 rounded-lg font-semibold transition text-slate-600 hover:text-slate-900';
+      renderMainDisplay();
+    });
+
+    modeBookBtn.addEventListener('click', () => {
+      appState.viewMode = 'book';
+      renderMainDisplay();
+    });
+
+    btnToggleHeaders.addEventListener('click', () => {
+      appState.showHeaders = !appState.showHeaders;
+      if (appState.showHeaders) {
+        headersLabel.textContent = 'Con Títulos';
+        btnToggleHeaders.classList.remove('bg-slate-50', 'text-slate-700', 'border-slate-200');
+        btnToggleHeaders.classList.add('bg-indigo-50', 'text-indigo-700', 'border-indigo-200');
+      } else {
+        headersLabel.textContent = 'Sin Títulos';
+        btnToggleHeaders.classList.remove('bg-indigo-50', 'text-indigo-700', 'border-indigo-200');
+        btnToggleHeaders.classList.add('bg-slate-50', 'text-slate-700', 'border-slate-200');
+      }
       renderMainDisplay();
     });
 
@@ -1288,6 +1229,13 @@ y los [Am]acordes entre cor[F]chetes//`
     btnToggleColumns.addEventListener('click', () => {
       appState.twoColumns = !appState.twoColumns;
       columnsLabel.textContent = appState.twoColumns ? '2 Col' : '1 Col';
+      if (appState.twoColumns) {
+        btnToggleColumns.classList.remove('border-slate-200', 'text-slate-700');
+        btnToggleColumns.classList.add('border-indigo-200', 'bg-indigo-50', 'text-indigo-700');
+      } else {
+        btnToggleColumns.classList.remove('border-indigo-200', 'bg-indigo-50', 'text-indigo-700');
+        btnToggleColumns.classList.add('border-slate-200', 'text-slate-700');
+      }
       renderMainDisplay();
     });
 
