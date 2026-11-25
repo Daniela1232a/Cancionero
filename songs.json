@@ -108,7 +108,7 @@
     "title": "Los que esperan en Jehová",
     "artist": "",
     "key": "Am",
-    "transpose": 0,
+    "transpose": -2,
     "content": "Los que es[Am]peran, los que esperan en Jeho[E]vá\nLos que esperan, los que esperan en Jeho[Am]vá\n//Como las [Dm]águilas, como las [Am]águilas, sus [E]alas\nlevanta[Am]rán//\nCorre[G]rán y no se cansa[C]rán, Camina[G]rán, no se fatiga[C]rán\n//Nuevas fu[Dm]erzas tendrán, Nuevas fu[Am]erzas tendrán\nLos que esp[E]eran, los que esperan en Jeho[Am]vá//"
   },
   {
@@ -116,7 +116,7 @@
     "title": "Cuando el pueblo del Señor alaba a Dios",
     "artist": "",
     "key": "Bm",
-    "transpose": 0,
+    "transpose": -4,
     "content": "//Cuando el [Bm]pueblo del Señor alaba a Dios,\nsuceden [F#]cosas, suceden cosas, maravi[Bm]llosas//\n\n//Hay sani[Em]dad, libera[Bm]ción,\nse [F#]siente la presencia del Se[Bm]ñor//\n\n//Y a[Bm]quí se s[F#]iente la presencia de [Bm]Dios//\n//Se siente el [Em]fuego del [A]Espíritu S[D]anto //\n\n//[Bm]Siento gozo, [F#]siento paz,\nsiento el amor que [Bm]Dios me da//\n//Y a[Bm]quí se s[F#]iente la presencia de [Bm]Dios//"
   },
   {
@@ -180,7 +180,7 @@
     "title": "Viva la fe",
     "artist": "",
     "key": "C",
-    "transpose": 0,
+    "transpose": -3,
     "content": "Viva la [C]fe, viva la Esperanza, viva el A[G]mor\nViva la fe, viva la Esperanza, viva el A[C]mor\nViva la fe, viva la Esperanza, viva el A[F]mor\nQue viva C[C]risto, que viva C[G]risto, que viva el r[C]ey\n\n//Que viva C[G]risto, que viva, que viva C[C]risto\nQue [Am]viva, que viva C[Dm]risto, que [G]viva el [C]rey//"
   },
   {
@@ -252,7 +252,7 @@
     "title": "Hay una unción aquí",
     "artist": "",
     "key": "E",
-    "transpose": 0,
+    "transpose": -2,
     "content": "//Hay una un[F#m]ción aq[B]uí Cayendo [G#m]sobre [C#m]mi\nCurándo[F#m]me, camb[B]iando mi [E]ser//\n\n//Mi espíritu y mi [A]alma se está lle[B]nando\nCon el po[G#m]der de tu Espíritu [C#m]Santo\nMi [F#m]vida nunca m[B]ás será ig[E]ual//"
   },
   {
@@ -284,7 +284,7 @@
     "title": "Padre oh cuanto cuanto te amo",
     "artist": "",
     "key": "Bm",
-    "transpose": 0,
+    "transpose": -2,
     "content": "Intro  [Bm]////   [Em]//    [F#]//\n//[Bm]Padre oh cuanto cuanto te [D]amo, [A]padre oh cuanto te a[Bm]doro//\n//Sin [D]ti no se lo que ha[A]ría, sin [G]ti. [A]   yo me mori[Bm]ría//\n//[Bm]Eres palabra de [D]vida, [A]eres la luz de mi v[Bm]ida//\n//Sin [D]ti no se lo que ha[A]ría, sin [G]ti. [A]   yo me mori[Bm]ría//"
   },
   {
@@ -316,7 +316,7 @@
     "title": "Oh poder pentecostal ven hoy a mi",
     "artist": "",
     "key": "C",
-    "transpose": 0,
+    "transpose": -5,
     "content": "Oh po[D]der pentecostal ven hoy a mi\nOh poder pentecostal ven hoy a [A]mi\nYo quie[D]ro sentir el gozo\nDe este [G]fuego tan glorioso\nOh po[D]der pentecos[A]tal ven hoy a [D]mí.\n\n//En[D]vía tu poder envía tu poder\nEnvía tu poder Se[A]ñor\nEnvía tu poder envía tu poder\nEn[G]vía tu po[A]der Se[D]ñor //\n\n//Manda f[D]uego Señor manda f[G]uego Señor\nY bau[D]tízanos con tu po[A]der\nManda f[D]uego Señor manda f[G]uego Señor\nY bau[D]tízanos con [A]tu po[D]der //"
   },
   {
@@ -332,7 +332,7 @@
     "title": "Esta alegría no va a salir",
     "artist": "",
     "key": "C",
-    "transpose": 0,
+    "transpose": -5,
     "content": "Esta ale[D]gría no va a sa[A]lir, no va a salir\nEsta alegría no va a sa[D]lir, no va a salir\nEsta alegría no va a sa[G]lir\nPorque esta [A]dentro de mi cora[D]zón.\n\n// El fuego [A]cae, cae, cae\nLos males [D]salen, salen, salen\nY el cre[G]yente a[A]laba a su Se[D]ñor //"
   },
   {
@@ -340,7 +340,7 @@
     "title": "Va bajando ya",
     "artist": "",
     "key": "C",
-    "transpose": 0,
+    "transpose": -3,
     "content": "Va baj[C]ando ya, va bajando ya\nVa bajando la gloria de Jeho[G]vá\nSi su [F]pueblo empieza a o[G]rar\nEl Se[C]ñor empieza a o[Am]brar\nVa ba[Dm]jando la [G]gloria de Jeho[C]vá"
   },
   {
@@ -348,7 +348,7 @@
     "title": "Te Alabarán Oh Jehová",
     "artist": "",
     "key": "C",
-    "transpose": 0,
+    "transpose": -3,
     "content": "//Te Alaba[C]rán Oh Jehová Todos los Reyes\nTodos los reyes de la [G]Tierra\nPorque han oído los dichos de tu boca\nY canta[F]rán de los ca[G]minos de Jeho[C]vá//\n//Porque la [F]Gloria de Jehová es Grande\nPorque Jehová es Excelso en sus ca[C]minos\nPorque Jeho[Am]vá atiende al hu[Dm]milde\nMas [G]mira de lejos al al[C]tivo//"
   },
   {
@@ -356,7 +356,7 @@
     "title": "Los hijos de Sión",
     "artist": "Tradicional / Alabanza",
     "key": "C",
-    "transpose": 0,
+    "transpose": -3,
     "content": "//Los [C]hijos de Sión, se [F]gozan en su [C]Rey\nSe gozan en su Rey can[G]tando\nCon pan[C]deros y arpas, [F]cantan alabanzas\n[C]Cantan ala[G]banzas al [C]rey //\n\n# Coro\n//[C]Aleluya, [F]ale[C]luya, [F]ale[C]luya,\n[G]am[C]én//"
   },
   {
