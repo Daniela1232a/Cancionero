@@ -6,6 +6,8 @@
   <title>SongCraft - Editor de Cifrados y Cancionero con GitHub Sync</title>
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
+  <!-- jsPDF para generación real de PDF y vista previa -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -51,13 +53,11 @@
     }
 
     .verse-block {
-      page-break-inside: avoid;
       break-inside: avoid;
       margin-bottom: 0.85rem;
     }
 
     .song-sheet-compact {
-      page-break-inside: avoid;
       break-inside: avoid;
       margin-bottom: 1.15rem;
     }
@@ -67,55 +67,12 @@
       column-count: 2;
       column-gap: 2.2rem;
     }
-
-    /* Print Styles for PDF Export */
-    @media print {
-      @page {
-        size: letter portrait;
-        margin: 1.1cm 1cm 1.1cm 1cm;
-      }
-      body {
-        background: #ffffff !important;
-        color: #000000 !important;
-        padding: 0 !important;
-        margin: 0 !important;
-      }
-      .no-print {
-        display: none !important;
-      }
-      .print-area {
-        display: block !important;
-        width: 100% !important;
-        max-width: 100% !important;
-        margin: 0 !important;
-        padding: 0 !important;
-        background: transparent !important;
-        box-shadow: none !important;
-        border: none !important;
-      }
-      .song-page-break {
-        page-break-after: always;
-        break-after: page;
-      }
-      .song-page-break:last-child {
-        page-break-after: auto;
-        break-after: auto;
-      }
-      .toc-page {
-        page-break-after: always;
-        break-after: page;
-      }
-      .song-line, .verse-block, .song-sheet-compact {
-        page-break-inside: avoid;
-        break-inside: avoid;
-      }
-    }
   </style>
 </head>
 <body class="bg-slate-100 text-slate-800 antialiased min-h-screen flex flex-col">
 
   <!-- Main Navigation Bar -->
-  <header class="no-print bg-slate-900 text-white border-b border-slate-800 sticky top-0 z-40 shadow-sm">
+  <header class="bg-slate-900 text-white border-b border-slate-800 sticky top-0 z-40 shadow-sm">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between gap-4">
       
       <!-- Brand -->
@@ -148,9 +105,10 @@
           <span class="hidden sm:inline">Guía Formato</span>
         </button>
 
-        <button type="button" id="btnExportPDF" class="px-4 py-2 rounded-xl text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-500 shadow-md shadow-indigo-600/30 transition flex items-center gap-1.5 cursor-pointer">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
-          <span>Exportar a PDF</span>
+        <!-- Generate & Preview PDF button -->
+        <button type="button" id="btnGeneratePDF" class="px-4 py-2 rounded-xl text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-500 shadow-md shadow-indigo-600/30 transition flex items-center gap-1.5 cursor-pointer">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+          <span>Vista Previa PDF</span>
         </button>
       </div>
 
@@ -158,7 +116,7 @@
   </header>
 
   <!-- Cloud quick bar -->
-  <div id="cloudBar" class="no-print bg-slate-800 border-b border-slate-700 px-4 py-1.5 text-xs text-slate-200 flex items-center justify-between">
+  <div id="cloudBar" class="bg-slate-800 border-b border-slate-700 px-4 py-1.5 text-xs text-slate-200 flex items-center justify-between">
     <div class="flex items-center gap-2 max-w-7xl mx-auto w-full justify-between">
       <div class="flex items-center gap-2 truncate">
         <span class="w-2 h-2 rounded-full bg-slate-400" id="syncStatusDot"></span>
@@ -176,7 +134,7 @@
   </div>
 
   <!-- Notification Toast -->
-  <div id="toast" class="no-print fixed bottom-6 right-6 z-50 bg-slate-900 text-white px-4 py-3 rounded-xl shadow-2xl border border-slate-700 text-xs font-semibold opacity-0 transition-opacity duration-300 pointer-events-none flex items-center gap-2">
+  <div id="toast" class="fixed bottom-6 right-6 z-50 bg-slate-900 text-white px-4 py-3 rounded-xl shadow-2xl border border-slate-700 text-xs font-semibold opacity-0 transition-opacity duration-300 pointer-events-none flex items-center gap-2">
     <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
     <span id="toastMsg">Mensaje</span>
   </div>
@@ -185,7 +143,7 @@
   <div class="flex-1 max-w-7xl w-full mx-auto p-3 sm:p-5 grid grid-cols-1 lg:grid-cols-12 gap-5">
 
     <!-- COLUMN 1: Song Library (3 Cols) -->
-    <aside class="no-print lg:col-span-3 flex flex-col bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden h-[calc(100vh-8.5rem)] sticky top-28">
+    <aside class="lg:col-span-3 flex flex-col bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden h-[calc(100vh-8.5rem)] sticky top-28">
       
       <div class="p-3.5 bg-slate-50 border-b border-slate-200 flex flex-col gap-2.5">
         <div class="flex items-center justify-between">
@@ -229,7 +187,7 @@
     </aside>
 
     <!-- COLUMN 2: Real-time ChordPro Editor (4 Cols) -->
-    <section class="no-print lg:col-span-4 flex flex-col bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden h-[calc(100vh-8.5rem)] sticky top-28">
+    <section class="lg:col-span-4 flex flex-col bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden h-[calc(100vh-8.5rem)] sticky top-28">
       
       <div class="px-4 py-3 bg-slate-50 border-b border-slate-200 flex items-center justify-between gap-2">
         <span class="text-xs font-bold text-slate-800 uppercase tracking-wider flex items-center gap-1.5">
@@ -292,7 +250,7 @@
     <section class="lg:col-span-5 flex flex-col">
       
       <!-- Preview & Export Toolbar -->
-      <div class="no-print bg-white p-3 rounded-2xl shadow-sm border border-slate-200 mb-4 flex flex-wrap items-center justify-between gap-2 text-xs">
+      <div class="bg-white p-3 rounded-2xl shadow-sm border border-slate-200 mb-4 flex flex-wrap items-center justify-between gap-2 text-xs">
         
         <!-- View Mode: Single vs Songbook -->
         <div class="inline-flex rounded-xl bg-slate-100 p-1 border border-slate-200">
@@ -315,24 +273,20 @@
 
         <!-- Sheet Display Settings -->
         <div class="flex items-center gap-1.5 flex-wrap">
-          <!-- Compact Mode Toggle (No Titles / Continuous) -->
           <button type="button" id="btnToggleCompact" class="px-2.5 py-1 rounded-lg border border-indigo-200 bg-indigo-50 text-indigo-700 font-semibold transition cursor-pointer" title="Ocultar o mostrar títulos e índice para ahorrar espacio">
             Sin Títulos
           </button>
 
-          <!-- Chord Color -->
           <select id="selectColor" class="bg-slate-50 border border-slate-200 rounded-lg px-2 py-1 text-xs font-semibold focus:outline-none">
             <option value="text-slate-900" selected>Negro</option>
             <option value="text-blue-700">Azul</option>
             <option value="text-red-700">Rojo</option>
           </select>
 
-          <!-- Columns toggle -->
           <button type="button" id="btnToggleColumns" class="px-2.5 py-1 rounded-lg border border-slate-200 hover:bg-slate-50 font-medium text-slate-700 flex items-center gap-1 cursor-pointer" title="Alternar 1 o 2 columnas">
             <span id="columnsLabel">2 Col</span>
           </button>
 
-          <!-- Font Size -->
           <div class="flex items-center gap-0.5">
             <button type="button" id="btnFontDown" class="w-6 h-6 flex items-center justify-center rounded border border-slate-200 font-bold hover:bg-slate-50 cursor-pointer">-</button>
             <button type="button" id="btnFontUp" class="w-6 h-6 flex items-center justify-center rounded border border-slate-200 font-bold hover:bg-slate-50 cursor-pointer">+</button>
@@ -341,15 +295,50 @@
 
       </div>
 
-      <!-- Document Display (Printable Canvas Area) -->
-      <div id="printDocument" class="print-area bg-white rounded-2xl shadow-md border border-slate-200 p-6 sm:p-10 min-h-[600px] flex flex-col"></div>
+      <!-- Document Display -->
+      <div id="printDocument" class="bg-white rounded-2xl shadow-md border border-slate-200 p-6 sm:p-10 min-h-[600px] flex flex-col"></div>
 
     </section>
 
   </div>
 
+  <!-- MODAL: PDF Preview & Direct Download -->
+  <div id="modalPdfPreview" class="fixed inset-0 bg-slate-900/75 backdrop-blur-xs z-50 flex items-center justify-center p-3 sm:p-6 hidden">
+    <div class="bg-white rounded-2xl max-w-5xl w-full h-[90vh] flex flex-col shadow-2xl border border-slate-200 overflow-hidden">
+      
+      <!-- Modal Header -->
+      <div class="px-5 py-3.5 bg-slate-900 text-white flex items-center justify-between gap-3">
+        <div class="flex items-center gap-2.5">
+          <span class="bg-indigo-600 p-1.5 rounded-lg">
+            <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+          </span>
+          <div>
+            <h3 class="text-sm font-bold">Vista Previa del Documento PDF</h3>
+            <p id="pdfPreviewSubtitle" class="text-[11px] text-slate-400">Listo para descargar</p>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <button type="button" id="btnDownloadGeneratedPdf" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-bold shadow-md transition flex items-center gap-1.5 cursor-pointer">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+            Descargar PDF
+          </button>
+          <button type="button" onclick="closeModal('modalPdfPreview')" class="px-3 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-xs font-semibold transition cursor-pointer">
+            Cerrar
+          </button>
+        </div>
+      </div>
+
+      <!-- Embedded PDF Viewer -->
+      <div class="flex-1 bg-slate-700 p-2 sm:p-4 flex flex-col">
+        <iframe id="pdfPreviewFrame" class="w-full h-full rounded-xl bg-white shadow-inner border-0" title="Vista previa PDF"></iframe>
+      </div>
+
+    </div>
+  </div>
+
   <!-- MODAL: GitHub Sync Configuration -->
-  <div id="modalGithubSync" class="no-print fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-4 hidden">
+  <div id="modalGithubSync" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-4 hidden">
     <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-slate-200 space-y-4">
       <div class="flex items-center justify-between border-b border-slate-100 pb-3">
         <h3 class="text-base font-bold text-slate-900 flex items-center gap-2">
@@ -412,7 +401,7 @@
   </div>
 
   <!-- MODAL: Syntax Help Guide -->
-  <div id="modalSyntax" class="no-print fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-4 hidden">
+  <div id="modalSyntax" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-4 hidden">
     <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-slate-200 space-y-4">
       <div class="flex items-center justify-between border-b border-slate-100 pb-3">
         <h3 class="text-base font-bold text-slate-900 flex items-center gap-2">
@@ -431,8 +420,8 @@
         </div>
 
         <ul class="list-disc list-inside space-y-1">
-          <li><strong>Hoja Compacta ("Sin Títulos"):</strong> Imprime todas las canciones seleccionadas juntas en 2 columnas sin encabezados ni saltos de página para ahorrar espacio.</li>
-          <li><strong>Con Títulos:</strong> Agrega encabezado de canción, tono, índice y salto de página individual.</li>
+          <li><strong>Vista Previa PDF:</strong> Genera el documento PDF real en pantalla con columnas y acordes alineados para descargarlo directamente sin abrir la ventana de impresión.</li>
+          <li><strong>Sin Títulos / 2 Col:</strong> Acomoda todas las canciones marcadas en una hoja compacta para aprovechar todo el espacio.</li>
         </ul>
       </div>
 
@@ -446,17 +435,18 @@
     const STORAGE_KEY = 'songcraft_library_v1';
     const GITHUB_CONFIG_KEY = 'songcraft_gh_config_v1';
 
-    // Global application state (Sin canciones por defecto)
     let appState = {
       songs: [],
       activeSongId: null,
       selectedSongIds: new Set(),
-      viewMode: 'book',        // 'single' | 'book'
-      compactMode: true,       // true = sin títulos ni saltos de página (estilo hoja de coros)
-      fontSize: 13,            // Tamaño compacto por defecto
-      twoColumns: true,        // 2 columnas por defecto
+      viewMode: 'book',
+      compactMode: true,
+      fontSize: 12,
+      twoColumns: true,
       chordColorClass: 'text-slate-900',
       searchQuery: '',
+      currentPdfDoc: null,
+      currentPdfFilename: 'cancionero.pdf',
       ghConfig: {
         username: '',
         repo: '',
@@ -752,6 +742,244 @@
         .replace(/>/g, '&gt;');
     }
 
+    /* ==========================================================================
+       REAL PDF GENERATOR (jsPDF) WITH PREVIEW & DIRECT DOWNLOAD
+       ========================================================================== */
+    function generateRealPDFPreview() {
+      const targetSongs = appState.viewMode === 'single'
+        ? (getActiveSong() ? [getActiveSong()] : [])
+        : appState.songs.filter(s => appState.selectedSongIds.has(s.id));
+
+      if (targetSongs.length === 0) {
+        showToast('Selecciona al menos una canción para generar el PDF');
+        return;
+      }
+
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF({
+        orientation: 'portrait',
+        unit: 'mm',
+        format: 'letter' // 215.9 x 279.4 mm
+      });
+
+      const pageWidth = doc.internal.pageSize.getWidth();
+      const pageHeight = doc.internal.pageSize.getHeight();
+      const marginX = 12;
+      const marginY = 14;
+      const maxBottomY = pageHeight - 12;
+      const colGap = 10;
+
+      const numCols = appState.twoColumns ? 2 : 1;
+      const colWidth = numCols === 2
+        ? (pageWidth - marginX * 2 - colGap) / 2
+        : (pageWidth - marginX * 2);
+
+      // Font sizes scaled neatly for PDF
+      const lyricFontSize = Math.max(8, Math.min(16, appState.fontSize * 0.78));
+      const chordFontSize = lyricFontSize * 0.92;
+      const lineStepWithChord = lyricFontSize * 0.85;
+      const lineStepPlain = lyricFontSize * 0.48;
+      const emptyLineStep = lyricFontSize * 0.35;
+      const songGapStep = lyricFontSize * 0.55;
+
+      // Color choice for chords
+      let chordRGB = [15, 23, 42]; // Negro
+      if (appState.chordColorClass === 'text-blue-700') chordRGB = [29, 78, 216];
+      if (appState.chordColorClass === 'text-red-700') chordRGB = [185, 28, 28];
+
+      let currentCol = 0;
+      let cursorY = marginY;
+
+      function getColX(colIdx) {
+        return marginX + colIdx * (colWidth + colGap);
+      }
+
+      function advanceColumnOrPage(neededHeight) {
+        if (cursorY + neededHeight > maxBottomY) {
+          if (numCols === 2 && currentCol === 0) {
+            currentCol = 1;
+            cursorY = marginY;
+          } else {
+            doc.addPage();
+            currentCol = 0;
+            cursorY = marginY;
+          }
+        }
+      }
+
+      // Optional Table of Contents if not in compact mode and multiple songs
+      if (!appState.compactMode && appState.viewMode === 'book') {
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(18);
+        doc.setTextColor(15, 23, 42);
+        doc.text('REPERTORIO MUSICAL', pageWidth / 2, cursorY + 6, { align: 'center' });
+        cursorY += 14;
+
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(10);
+        doc.setTextColor(100, 116, 139);
+        doc.text(`${targetSongs.length} Canciones seleccionadas`, pageWidth / 2, cursorY, { align: 'center' });
+        cursorY += 12;
+
+        targetSongs.forEach((song, idx) => {
+          if (cursorY > maxBottomY) {
+            doc.addPage();
+            cursorY = marginY;
+          }
+          doc.setFont('helvetica', 'bold');
+          doc.setFontSize(10);
+          doc.setTextColor(15, 23, 42);
+          doc.text(`${idx + 1}. ${song.title || 'Sin título'}`, marginX + 10, cursorY);
+
+          if (song.key) {
+            doc.setFont('helvetica', 'normal');
+            doc.setTextColor(100, 116, 139);
+            doc.text(`[${song.key}]`, pageWidth - marginX - 20, cursorY);
+          }
+          cursorY += 6.5;
+        });
+
+        doc.addPage();
+        currentCol = 0;
+        cursorY = marginY;
+      }
+
+      // Render each song
+      targetSongs.forEach((song, sIdx) => {
+        const semitones = song.transpose || 0;
+        const lines = (song.content || '').split('\n');
+
+        // If full mode (Con Títulos) and not compact, start each song cleanly or print header
+        if (!appState.compactMode) {
+          if (sIdx > 0 && appState.viewMode === 'book') {
+            doc.addPage();
+            currentCol = 0;
+            cursorY = marginY;
+          }
+
+          const x = getColX(currentCol);
+          doc.setFont('helvetica', 'bold');
+          doc.setFontSize(14);
+          doc.setTextColor(15, 23, 42);
+          doc.text(song.title || 'Sin Título', x, cursorY + 4);
+          cursorY += 7;
+
+          if (song.artist || song.key) {
+            doc.setFont('helvetica', 'normal');
+            doc.setFontSize(8.5);
+            doc.setTextColor(100, 116, 139);
+            const meta = [
+              song.artist ? `Autor: ${song.artist}` : '',
+              song.key ? `Tono: ${song.key}` : ''
+            ].filter(Boolean).join(' • ');
+            doc.text(meta, x, cursorY + 2);
+            cursorY += 5;
+          }
+
+          doc.setDrawColor(15, 23, 42);
+          doc.setLineWidth(0.4);
+          doc.line(x, cursorY, x + colWidth, cursorY);
+          cursorY += 5;
+        } else {
+          // Compact mode: ensure at least first couple of lines fit before starting a new song block
+          advanceColumnOrPage(lineStepWithChord * 2.5);
+        }
+
+        lines.forEach((rawLine) => {
+          const trimmed = rawLine.trim();
+
+          if (trimmed === '') {
+            cursorY += emptyLineStep;
+            return;
+          }
+
+          if (trimmed.startsWith('#') || (trimmed.startsWith('{comment:') && trimmed.endsWith('}'))) {
+            if (!appState.compactMode) {
+              advanceColumnOrPage(lineStepPlain + 2);
+              const x = getColX(currentCol);
+              const comment = trimmed.replace(/^#\s*/, '').replace(/^{comment:\s*/, '').replace(/}$/, '').toUpperCase();
+              doc.setFont('helvetica', 'bold');
+              doc.setFontSize(8);
+              doc.setTextColor(120, 130, 145);
+              doc.text(comment, x, cursorY + 3);
+              cursorY += lineStepPlain + 2;
+            }
+            return;
+          }
+
+          const tokens = parseChordProLine(rawLine);
+          const hasAnyChord = tokens.some(t => t.chord && t.chord.trim() !== '');
+          const stepH = hasAnyChord ? lineStepWithChord : lineStepPlain;
+
+          advanceColumnOrPage(stepH);
+
+          let lineCursorX = getColX(currentCol);
+          const baselineY = cursorY + (hasAnyChord ? stepH * 0.82 : stepH * 0.78);
+          const chordY = baselineY - (lyricFontSize * 0.38);
+
+          tokens.forEach((tok) => {
+            const transChord = tok.chord ? transposeChord(tok.chord, semitones) : '';
+            const lyricText = tok.text || '';
+
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(chordFontSize);
+            const chordW = transChord ? doc.getTextWidth(transChord) : 0;
+
+            doc.setFont('helvetica', 'normal');
+            doc.setFontSize(lyricFontSize);
+            const lyricW = lyricText ? doc.getTextWidth(lyricText) : 0;
+
+            if (transChord) {
+              doc.setFont('helvetica', 'bold');
+              doc.setFontSize(chordFontSize);
+              doc.setTextColor(chordRGB[0], chordRGB[1], chordRGB[2]);
+              doc.text(transChord, lineCursorX, chordY);
+            }
+
+            if (lyricText) {
+              doc.setFont('helvetica', 'normal');
+              doc.setFontSize(lyricFontSize);
+              doc.setTextColor(15, 23, 42);
+              doc.text(lyricText, lineCursorX, baselineY);
+            }
+
+            const advanceW = Math.max(lyricW, transChord && !lyricText ? chordW + 1.5 : 0);
+            lineCursorX += advanceW;
+          });
+
+          cursorY += stepH;
+        });
+
+        cursorY += songGapStep;
+      });
+
+      // Generate Blob URL and open in preview modal
+      const pdfBlobUrl = doc.output('bloburl');
+      appState.currentPdfDoc = doc;
+      appState.currentPdfFilename = appState.viewMode === 'single' && targetSongs[0]
+        ? `${targetSongs[0].title.replace(/[^a-z0-9áéíóúñ\s]/gi, '').trim() || 'cancion'}.pdf`
+        : `Cancionero_${targetSongs.length}_canciones.pdf`;
+
+      const totalPages = doc.internal.getNumberOfPages();
+      document.getElementById('pdfPreviewSubtitle').textContent =
+        `${appState.currentPdfFilename} • ${totalPages} página${totalPages > 1 ? 's' : ''} (Tamaño Carta)`;
+
+      document.getElementById('pdfPreviewFrame').src = pdfBlobUrl;
+      openModal('modalPdfPreview');
+    }
+
+    document.getElementById('btnGeneratePDF').addEventListener('click', generateRealPDFPreview);
+
+    document.getElementById('btnDownloadGeneratedPdf').addEventListener('click', () => {
+      if (appState.currentPdfDoc) {
+        appState.currentPdfDoc.save(appState.currentPdfFilename);
+        showToast('Descargando ' + appState.currentPdfFilename);
+      }
+    });
+
+    /* ==========================================================================
+       HTML LIVE PREVIEW RENDERING
+       ========================================================================== */
     function renderSongBodyLines(song, semitones) {
       const lines = (song.content || '').split('\n');
       let html = '';
@@ -816,7 +1044,6 @@
     function renderSongHTML(song, transposeOffset = 0, isPartOfBook = false, songIndex = null) {
       const semitones = (song.transpose || 0) + transposeOffset;
       
-      // Compact Mode (Sin Títulos ni saltos de página)
       if (appState.compactMode) {
         return `
           <article class="song-sheet-compact">
@@ -825,10 +1052,9 @@
         `;
       }
 
-      // Full Mode (Con Título, Autor y Salto de Página)
       const columnClass = (appState.twoColumns && !isPartOfBook) ? 'song-columns-2' : '';
       return `
-        <article class="song-sheet mb-10 ${isPartOfBook ? 'song-page-break' : ''}">
+        <article class="song-sheet mb-10">
           <header class="border-b-2 border-slate-900 pb-3 mb-6 flex justify-between items-end">
             <div>
               ${isPartOfBook && songIndex !== null ? `<span class="text-xs font-bold text-indigo-600 block mb-0.5">Canción #${songIndex + 1}</span>` : ''}
@@ -889,7 +1115,7 @@
           printDocument.innerHTML = compactHTML;
         } else {
           let bookHTML = `
-            <div class="toc-page mb-12 border-b-4 border-slate-900 pb-8">
+            <div class="mb-12 border-b-4 border-slate-900 pb-8">
               <div class="text-center mb-8 pt-4">
                 <h1 class="text-3xl font-extrabold uppercase tracking-widest text-slate-900">Repertorio Musical</h1>
                 <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider mt-1">${selectedList.length} Canciones</p>
@@ -1217,7 +1443,7 @@
     });
 
     document.getElementById('btnFontDown').addEventListener('click', () => {
-      if (appState.fontSize > 10) {
+      if (appState.fontSize > 9) {
         appState.fontSize -= 1;
         renderMainDisplay();
       }
@@ -1257,10 +1483,6 @@
       syncEditorInputs();
       renderMainDisplay();
       showToast(`Eliminada: ${origTitle}`);
-    });
-
-    document.getElementById('btnExportPDF').addEventListener('click', () => {
-      window.print();
     });
 
     document.getElementById('btnExportJSON').addEventListener('click', () => {
