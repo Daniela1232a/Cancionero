@@ -21,45 +21,48 @@
       font-family: 'Fira Code', monospace;
     }
 
-    /* Interlinear Chord Rendering */
-    .chord-pair {
-      display: inline-flex;
-      flex-direction: column;
-      vertical-align: bottom;
+    /* Interlinear Chord Rendering (sin encimar letras partidas por acordes) */
+    .song-line {
+      display: block;
       position: relative;
-      margin-right: 0.03em;
+      padding-top: 1.18em;
+      line-height: 1.3;
+      margin-bottom: 0.22rem;
+      white-space: pre-wrap;
+      word-break: break-word;
     }
 
-    .chord-badge {
+    .chord-anchor {
+      display: inline-block;
+      position: relative;
+      width: 0;
+      height: 0;
+      vertical-align: baseline;
+    }
+
+    .chord-label {
+      position: absolute;
+      bottom: 1.05em;
+      left: 0;
       font-family: 'Inter', system-ui, sans-serif;
       font-weight: 700;
-      line-height: 1.1;
-      height: 1.15em;
-      white-space: pre;
-      user-select: text;
-    }
-
-    .lyric-text {
-      line-height: 1.25;
-      white-space: pre;
-    }
-
-    .song-line {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: flex-end;
-      min-height: 2.05em;
-      margin-bottom: 0.2rem;
+      line-height: 1;
+      white-space: nowrap;
+      pointer-events: none;
     }
 
     .verse-block {
       break-inside: avoid;
-      margin-bottom: 0.85rem;
+      margin-bottom: 0.75rem;
     }
 
     .song-sheet-compact {
       break-inside: avoid;
-      margin-bottom: 1.15rem;
+    }
+
+    .force-col-break {
+      break-before: column;
+      -webkit-column-break-before: always;
     }
 
     /* Multi-column layouts */
@@ -279,6 +282,13 @@
             Sin Títulos
           </button>
 
+          <!-- Global Song Gap selector -->
+          <select id="selectSongSpacing" class="bg-slate-50 border border-slate-200 rounded-lg px-2 py-1 text-xs font-semibold focus:outline-none" title="Espacio general entre canciones">
+            <option value="compact">Espacio: Bajo</option>
+            <option value="normal" selected>Espacio: Normal</option>
+            <option value="wide">Espacio: Amplio</option>
+          </select>
+
           <select id="selectColor" class="bg-slate-50 border border-slate-200 rounded-lg px-2 py-1 text-xs font-semibold focus:outline-none">
             <option value="text-slate-900" selected>Negro</option>
             <option value="text-blue-700">Azul</option>
@@ -406,22 +416,18 @@
       <div class="flex items-center justify-between border-b border-slate-100 pb-3">
         <h3 class="text-base font-bold text-slate-900 flex items-center gap-2">
           <span class="p-1.5 bg-indigo-50 text-indigo-600 rounded-lg">🎵</span>
-          Formato de Cifrado (ChordPro)
+          Control de Columnas y Espacios
         </h3>
         <button type="button" onclick="closeModal('modalSyntax')" class="text-slate-400 hover:text-slate-600 cursor-pointer">✕</button>
       </div>
 
       <div class="space-y-3 text-xs text-slate-600 leading-relaxed">
-        <p>Escribe la letra normalmente y pon el acorde entre corchetes <code>[Acorde]</code> <strong>justo antes</strong> de la letra o sílaba donde debe sonar.</p>
+        <p>En cada canción marcada en la lista izquierda tienes controles individuales para acomodar tu hoja exactamente como quieras:</p>
 
-        <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 font-mono-code text-[11px] space-y-1">
-          <p class="text-indigo-700 font-semibold">//No hay [G]Dios que pueda hacer las [D]obras</p>
-          <p class="text-indigo-700 font-semibold">como las que [A]haces tú // [D]</p>
-        </div>
-
-        <ul class="list-disc list-inside space-y-1">
-          <li><strong>Orden de selección:</strong> Marca las casillas una por una en el orden exacto que desees. Cada canción marcada sube arriba en la lista con su número (1, 2, 3...) y las flechas ▲ / ▼ te permiten reordenarlas al instante.</li>
-          <li><strong>Sin Títulos / 2 Col:</strong> Acomoda todas las canciones marcadas en una hoja compacta para aprovechar todo el espacio.</li>
+        <ul class="list-disc list-inside space-y-1.5">
+          <li><strong>+Esp / -Esp:</strong> Añade o quita líneas en blanco extra debajo de esa canción específica para separarla más de la siguiente.</li>
+          <li><strong>Col 2 (Salto de columna):</strong> Activa este botón en una canción para que ella (y las siguientes) pasen directamente a la <strong>columna derecha</strong>, permitiéndote decidir con exactitud qué canciones van a la izquierda y cuáles a la derecha.</li>
+          <li><strong>▲ / ▼:</strong> Sube o baja el orden de aparición de cada canción marcada.</li>
         </ul>
       </div>
 
@@ -438,7 +444,9 @@
     let appState = {
       songs: [],
       activeSongId: null,
-      selectedSongIds: [], // Array estrictamente ordenado según el clic del usuario
+      selectedSongIds: [],     // Orden exacto de selección
+      songLayoutPrefs: {},     // { [id]: { extraLines: number, colBreak: boolean } }
+      songSpacing: 'normal',   // 'compact' | 'normal' | 'wide'
       viewMode: 'book',
       compactMode: true,
       fontSize: 12,
@@ -478,6 +486,7 @@
     const transposeDisplay = document.getElementById('transposeDisplay');
     const transposeControls = document.getElementById('transposeControls');
     const selectColor = document.getElementById('selectColor');
+    const selectSongSpacing = document.getElementById('selectSongSpacing');
     const btnToggleColumns = document.getElementById('btnToggleColumns');
     const columnsLabel = document.getElementById('columnsLabel');
     const btnToggleCompact = document.getElementById('btnToggleCompact');
@@ -495,6 +504,13 @@
     const btnPushToGithub = document.getElementById('btnPushToGithub');
     const btnPullFromGithub = document.getElementById('btnPullFromGithub');
     const ghSyncLog = document.getElementById('ghSyncLog');
+
+    function getSongLayout(id) {
+      if (!appState.songLayoutPrefs[id]) {
+        appState.songLayoutPrefs[id] = { extraLines: 0, colBreak: false };
+      }
+      return appState.songLayoutPrefs[id];
+    }
 
     function getOrderedSelectedSongs() {
       return appState.selectedSongIds
@@ -523,7 +539,6 @@
       if (appState.songs.length > 0) {
         appState.activeSongId = appState.songs[0].id;
       }
-      // Inicia sin marcas para que selecciones en el orden exacto que desees
       appState.selectedSongIds = [];
 
       updateGhUiState();
@@ -713,28 +728,29 @@
       });
     }
 
-    function parseChordProLine(line) {
-      const tokens = [];
+    /**
+     * Extrae la letra continua limpia y la posición (índice de carácter) de cada acorde
+     * para evitar partir palabras y encimar letras como "cr" + "eído".
+     */
+    function extractLineChordsAndPlainText(line) {
+      const chords = [];
+      let plainText = '';
       const regex = /\[(.*?)\]/g;
       let lastIndex = 0;
-      let currentChord = '';
-
       let match;
+
       while ((match = regex.exec(line)) !== null) {
-        const textSegment = line.substring(lastIndex, match.index);
-        if (currentChord || textSegment) {
-          tokens.push({ chord: currentChord, text: textSegment });
-        }
-        currentChord = match[1];
+        const textBefore = line.substring(lastIndex, match.index);
+        plainText += textBefore;
+        chords.push({
+          chord: match[1],
+          charIndex: plainText.length
+        });
         lastIndex = regex.lastIndex;
       }
 
-      const remainingText = line.substring(lastIndex);
-      if (currentChord || remainingText) {
-        tokens.push({ chord: currentChord, text: remainingText });
-      }
-
-      return tokens;
+      plainText += line.substring(lastIndex);
+      return { plainText, chords };
     }
 
     function escapeHtml(str) {
@@ -744,8 +760,20 @@
         .replace(/>/g, '&gt;');
     }
 
+    function getBaseSongGapMm() {
+      if (appState.songSpacing === 'compact') return 4;
+      if (appState.songSpacing === 'wide') return 12;
+      return 7.5;
+    }
+
+    function getBaseSongGapPx() {
+      if (appState.songSpacing === 'compact') return 12;
+      if (appState.songSpacing === 'wide') return 34;
+      return 20;
+    }
+
     /* ==========================================================================
-       REAL PDF GENERATOR (jsPDF) WITH PREVIEW & DIRECT DOWNLOAD
+       REAL PDF GENERATOR (jsPDF) - TEXTO CONTINUO SIN LETRAS ENCIMADAS
        ========================================================================== */
     function generateRealPDFPreview() {
       const targetSongs = appState.viewMode === 'single'
@@ -780,8 +808,8 @@
       const chordFontSize = lyricFontSize * 0.92;
       const lineStepWithChord = lyricFontSize * 0.85;
       const lineStepPlain = lyricFontSize * 0.48;
-      const emptyLineStep = lyricFontSize * 0.35;
-      const songGapStep = lyricFontSize * 0.55;
+      const emptyLineStep = lyricFontSize * 0.42;
+      const baseSongGapStep = getBaseSongGapMm();
 
       let chordRGB = [15, 23, 42];
       if (appState.chordColorClass === 'text-blue-700') chordRGB = [29, 78, 216];
@@ -794,16 +822,20 @@
         return marginX + colIdx * (colWidth + colGap);
       }
 
+      function forceNextColumnOrPage() {
+        if (numCols === 2 && currentCol === 0) {
+          currentCol = 1;
+          cursorY = marginY;
+        } else {
+          doc.addPage();
+          currentCol = 0;
+          cursorY = marginY;
+        }
+      }
+
       function advanceColumnOrPage(neededHeight) {
         if (cursorY + neededHeight > maxBottomY) {
-          if (numCols === 2 && currentCol === 0) {
-            currentCol = 1;
-            cursorY = marginY;
-          } else {
-            doc.addPage();
-            currentCol = 0;
-            cursorY = marginY;
-          }
+          forceNextColumnOrPage();
         }
       }
 
@@ -846,6 +878,12 @@
       targetSongs.forEach((song, sIdx) => {
         const semitones = song.transpose || 0;
         const lines = (song.content || '').split('\n');
+        const layoutPref = getSongLayout(song.id);
+
+        // Si el usuario activó "Col 2" (salto manual de columna) en esta canción
+        if (sIdx > 0 && layoutPref.colBreak && appState.compactMode) {
+          forceNextColumnOrPage();
+        }
 
         if (!appState.compactMode) {
           if (sIdx > 0 && appState.viewMode === 'book') {
@@ -903,50 +941,59 @@
             return;
           }
 
-          const tokens = parseChordProLine(rawLine);
-          const hasAnyChord = tokens.some(t => t.chord && t.chord.trim() !== '');
+          const { plainText, chords } = extractLineChordsAndPlainText(rawLine);
+          const hasAnyChord = chords.length > 0;
           const stepH = hasAnyChord ? lineStepWithChord : lineStepPlain;
 
           advanceColumnOrPage(stepH);
 
-          let lineCursorX = getColX(currentCol);
+          const startX = getColX(currentCol);
           const baselineY = cursorY + (hasAnyChord ? stepH * 0.82 : stepH * 0.78);
           const chordY = baselineY - (lyricFontSize * 0.38);
 
-          tokens.forEach((tok) => {
-            const transChord = tok.chord ? transposeChord(tok.chord, semitones) : '';
-            const lyricText = tok.text || '';
-
-            doc.setFont('helvetica', 'bold');
-            doc.setFontSize(chordFontSize);
-            const chordW = transChord ? doc.getTextWidth(transChord) : 0;
-
+          // 1. Dibuja toda la letra de un solo trazo continuo (evita que 'r' y 'e' se monten)
+          if (plainText) {
             doc.setFont('helvetica', 'normal');
             doc.setFontSize(lyricFontSize);
-            const lyricW = lyricText ? doc.getTextWidth(lyricText) : 0;
+            doc.setTextColor(15, 23, 42);
+            doc.text(plainText, startX, baselineY);
+          }
 
-            if (transChord) {
+          // 2. Dibuja cada acorde calculando el ancho exacto del texto previo
+          if (hasAnyChord) {
+            doc.setFont('helvetica', 'normal');
+            doc.setFontSize(lyricFontSize);
+
+            let lastChordEndX = -999;
+            chords.forEach((item) => {
+              const transChord = transposeChord(item.chord, semitones);
+              const prefix = plainText.substring(0, item.charIndex);
+              let chordX = startX + doc.getTextWidth(prefix);
+
+              // Evita que dos acordes consecutivos en la misma palabra se toquen
+              if (chordX < lastChordEndX + 1.2) {
+                chordX = lastChordEndX + 1.2;
+              }
+
               doc.setFont('helvetica', 'bold');
               doc.setFontSize(chordFontSize);
               doc.setTextColor(chordRGB[0], chordRGB[1], chordRGB[2]);
-              doc.text(transChord, lineCursorX, chordY);
-            }
+              doc.text(transChord, chordX, chordY);
 
-            if (lyricText) {
+              lastChordEndX = chordX + doc.getTextWidth(transChord);
+
+              // Restaura métrica de letra para medir el siguiente prefijo
               doc.setFont('helvetica', 'normal');
               doc.setFontSize(lyricFontSize);
-              doc.setTextColor(15, 23, 42);
-              doc.text(lyricText, lineCursorX, baselineY);
-            }
-
-            const advanceW = Math.max(lyricW, transChord && !lyricText ? chordW + 1.5 : 0);
-            lineCursorX += advanceW;
-          });
+            });
+          }
 
           cursorY += stepH;
         });
 
-        cursorY += songGapStep;
+        // Espacio base + espacios adicionales configurados por el usuario para esta canción
+        const extraMm = (layoutPref.extraLines || 0) * emptyLineStep;
+        cursorY += baseSongGapStep + extraMm;
       });
 
       const pdfBlobUrl = doc.output('bloburl');
@@ -973,8 +1020,32 @@
     });
 
     /* ==========================================================================
-       HTML LIVE PREVIEW RENDERING
+       HTML LIVE PREVIEW RENDERING (TEXTO CONTINUO + ANCLAS DE ACORDES)
        ========================================================================== */
+    function renderLineWithInlineChordsHTML(rawLine, semitones) {
+      const { plainText, chords } = extractLineChordsAndPlainText(rawLine);
+
+      if (chords.length === 0) {
+        return `<div class="song-line" style="padding-top: 0.15em;">${escapeHtml(plainText) || '&nbsp;'}</div>`;
+      }
+
+      let result = '';
+      let lastPos = 0;
+
+      chords.forEach((item) => {
+        const segment = plainText.substring(lastPos, item.charIndex);
+        result += escapeHtml(segment);
+
+        const transChord = transposeChord(item.chord, semitones);
+        result += `<span class="chord-anchor"><span class="chord-label ${appState.chordColorClass}">${escapeHtml(transChord)}</span></span>`;
+
+        lastPos = item.charIndex;
+      });
+
+      result += escapeHtml(plainText.substring(lastPos));
+      return `<div class="song-line">${result || '&nbsp;'}</div>`;
+    }
+
     function renderSongBodyLines(song, semitones) {
       const lines = (song.content || '').split('\n');
       let html = '';
@@ -1005,28 +1076,7 @@
           return;
         }
 
-        const tokens = parseChordProLine(line);
-        html += `<div class="song-line">`;
-
-        tokens.forEach((tok) => {
-          const transChord = tok.chord ? transposeChord(tok.chord, semitones) : '';
-          const chordSpan = transChord
-            ? `<span class="chord-badge ${appState.chordColorClass}">${escapeHtml(transChord)}</span>`
-            : `<span class="chord-badge">&nbsp;</span>`;
-
-          const lyricSpan = tok.text 
-            ? `<span class="lyric-text">${escapeHtml(tok.text)}</span>` 
-            : `<span class="lyric-text">&nbsp;</span>`;
-
-          html += `
-            <span class="chord-pair">
-              ${chordSpan}
-              ${lyricSpan}
-            </span>
-          `;
-        });
-
-        html += `</div>`;
+        html += renderLineWithInlineChordsHTML(line, semitones);
       });
 
       if (insideVerse) {
@@ -1038,10 +1088,14 @@
 
     function renderSongHTML(song, transposeOffset = 0, isPartOfBook = false, songIndex = null) {
       const semitones = (song.transpose || 0) + transposeOffset;
+      const layoutPref = getSongLayout(song.id);
+      const extraPx = (layoutPref.extraLines || 0) * 14;
+      const totalBottomMarginPx = getBaseSongGapPx() + extraPx;
       
       if (appState.compactMode) {
+        const breakClass = (isPartOfBook && songIndex > 0 && layoutPref.colBreak) ? 'force-col-break' : '';
         return `
-          <article class="song-sheet-compact">
+          <article class="song-sheet-compact ${breakClass}" style="margin-bottom: ${totalBottomMarginPx}px;">
             ${renderSongBodyLines(song, semitones)}
           </article>
         `;
@@ -1103,8 +1157,8 @@
         if (appState.compactMode) {
           const columnClass = appState.twoColumns ? 'song-columns-2' : '';
           let compactHTML = `<div class="${columnClass}" style="font-size: ${appState.fontSize}px;">`;
-          selectedList.forEach((song) => {
-            compactHTML += renderSongHTML(song, 0, false);
+          selectedList.forEach((song, idx) => {
+            compactHTML += renderSongHTML(song, 0, true, idx);
           });
           compactHTML += `</div>`;
           printDocument.innerHTML = compactHTML;
@@ -1151,7 +1205,6 @@
                (s.key && s.key.toLowerCase().includes(q));
       });
 
-      // Ordenar visualmente: primero las seleccionadas en su orden exacto (1, 2, 3...), luego las no seleccionadas
       const sortedFiltered = [...filtered].sort((a, b) => {
         const idxA = appState.selectedSongIds.indexOf(a.id);
         const idxB = appState.selectedSongIds.indexOf(b.id);
@@ -1190,24 +1243,43 @@
         const isActive = (song.id === appState.activeSongId);
         const orderIndex = appState.selectedSongIds.indexOf(song.id);
         const isChecked = orderIndex !== -1;
+        const layoutPref = getSongLayout(song.id);
 
         html += `
-          <div class="group flex items-center gap-2 p-2.5 rounded-xl transition cursor-pointer ${isActive ? 'bg-indigo-50/80 border border-indigo-200' : 'hover:bg-slate-50'}" onclick="selectActiveSong('${song.id}')">
-            <input type="checkbox" ${isChecked ? 'checked' : ''} class="rounded text-indigo-600 focus:ring-0 cursor-pointer shrink-0" onclick="event.stopPropagation(); toggleSongSelection('${song.id}')">
-            <div class="flex-1 min-w-0">
-              <div class="flex items-center justify-between gap-1">
-                <h4 class="text-xs font-bold truncate ${isActive ? 'text-indigo-950' : 'text-slate-800'}">
-                  ${isChecked ? `<span class="inline-flex items-center justify-center w-4 h-4 mr-1 text-[10px] font-bold bg-indigo-600 text-white rounded-full">${orderIndex + 1}</span>` : ''}
-                  ${escapeHtml(song.title || 'Sin Título')}
-                </h4>
-                ${song.key ? `<span class="text-[10px] font-mono font-bold bg-slate-200/80 text-slate-700 px-1 rounded shrink-0">${escapeHtml(song.key)}</span>` : ''}
+          <div class="group flex flex-col gap-1.5 p-2.5 rounded-xl transition cursor-pointer ${isActive ? 'bg-indigo-50/80 border border-indigo-200' : 'hover:bg-slate-50'}" onclick="selectActiveSong('${song.id}')">
+            <div class="flex items-center gap-2">
+              <input type="checkbox" ${isChecked ? 'checked' : ''} class="rounded text-indigo-600 focus:ring-0 cursor-pointer shrink-0" onclick="event.stopPropagation(); toggleSongSelection('${song.id}')">
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center justify-between gap-1">
+                  <h4 class="text-xs font-bold truncate ${isActive ? 'text-indigo-950' : 'text-slate-800'}">
+                    ${isChecked ? `<span class="inline-flex items-center justify-center w-4 h-4 mr-1 text-[10px] font-bold bg-indigo-600 text-white rounded-full">${orderIndex + 1}</span>` : ''}
+                    ${escapeHtml(song.title || 'Sin Título')}
+                  </h4>
+                  ${song.key ? `<span class="text-[10px] font-mono font-bold bg-slate-200/80 text-slate-700 px-1 rounded shrink-0">${escapeHtml(song.key)}</span>` : ''}
+                </div>
               </div>
-              <p class="text-[11px] text-slate-400 truncate">${escapeHtml(song.artist || '')}</p>
+              ${isChecked ? `
+                <div class="flex items-center gap-0.5 shrink-0" onclick="event.stopPropagation()">
+                  <button type="button" onclick="moveSelectedSong('${song.id}', -1)" class="text-[9px] leading-none px-1.5 py-1 bg-slate-100 hover:bg-indigo-100 text-slate-600 hover:text-indigo-700 rounded cursor-pointer" title="Subir orden">▲</button>
+                  <button type="button" onclick="moveSelectedSong('${song.id}', 1)" class="text-[9px] leading-none px-1.5 py-1 bg-slate-100 hover:bg-indigo-100 text-slate-600 hover:text-indigo-700 rounded cursor-pointer" title="Bajar orden">▼</button>
+                </div>
+              ` : ''}
             </div>
+
             ${isChecked ? `
-              <div class="flex flex-col gap-0.5 shrink-0" onclick="event.stopPropagation()">
-                <button type="button" onclick="moveSelectedSong('${song.id}', -1)" class="text-[9px] leading-none px-1 py-0.5 bg-slate-100 hover:bg-indigo-100 text-slate-600 hover:text-indigo-700 rounded cursor-pointer" title="Subir orden">▲</button>
-                <button type="button" onclick="moveSelectedSong('${song.id}', 1)" class="text-[9px] leading-none px-1 py-0.5 bg-slate-100 hover:bg-indigo-100 text-slate-600 hover:text-indigo-700 rounded cursor-pointer" title="Bajar orden">▼</button>
+              <div class="flex items-center justify-between pl-6 pt-0.5 text-[10px]" onclick="event.stopPropagation()">
+                <div class="flex items-center gap-1">
+                  <span class="text-slate-400">Espacio:</span>
+                  <button type="button" onclick="adjustSongExtraSpace('${song.id}', -1)" class="px-1.5 py-0.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded cursor-pointer" title="Quitar espacio inferior">-Esp</button>
+                  <span class="font-mono font-bold text-slate-600 w-3 text-center">${layoutPref.extraLines || 0}</span>
+                  <button type="button" onclick="adjustSongExtraSpace('${song.id}', 1)" class="px-1.5 py-0.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded cursor-pointer" title="Agregar más espacio debajo de esta canción">+Esp</button>
+                </div>
+
+                ${orderIndex > 0 ? `
+                  <button type="button" onclick="toggleSongColumnBreak('${song.id}')" class="px-1.5 py-0.5 rounded font-semibold transition cursor-pointer ${layoutPref.colBreak ? 'bg-amber-500 text-white' : 'bg-slate-100 text-slate-600 hover:bg-amber-100 hover:text-amber-800'}" title="Forzar inicio en la siguiente columna">
+                    ${layoutPref.colBreak ? '↳ Col 2 Activo' : '↳ Pasar a Col 2'}
+                  </button>
+                ` : ''}
               </div>
             ` : ''}
           </div>
@@ -1216,6 +1288,20 @@
 
       songListContainer.innerHTML = html;
     }
+
+    window.adjustSongExtraSpace = function(id, delta) {
+      const pref = getSongLayout(id);
+      pref.extraLines = Math.max(0, Math.min(15, (pref.extraLines || 0) + delta));
+      renderLibraryList();
+      renderMainDisplay();
+    };
+
+    window.toggleSongColumnBreak = function(id) {
+      const pref = getSongLayout(id);
+      pref.colBreak = !pref.colBreak;
+      renderLibraryList();
+      renderMainDisplay();
+    };
 
     window.moveSelectedSong = function(id, delta) {
       const idx = appState.selectedSongIds.indexOf(id);
@@ -1438,6 +1524,11 @@
         btnToggleCompact.textContent = 'Con Títulos';
         btnToggleCompact.className = 'px-2.5 py-1 rounded-lg border border-slate-200 bg-slate-50 text-slate-700 font-semibold transition cursor-pointer';
       }
+      renderMainDisplay();
+    });
+
+    selectSongSpacing.addEventListener('change', (e) => {
+      appState.songSpacing = e.target.value;
       renderMainDisplay();
     });
 
