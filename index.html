@@ -105,7 +105,6 @@
           <span class="hidden sm:inline">Guía Formato</span>
         </button>
 
-        <!-- Generate & Preview PDF button -->
         <button type="button" id="btnGeneratePDF" class="px-4 py-2 rounded-xl text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-500 shadow-md shadow-indigo-600/30 transition flex items-center gap-1.5 cursor-pointer">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
           <span>Vista Previa PDF</span>
@@ -165,9 +164,12 @@
         <div class="flex items-center justify-between text-[11px] pt-1">
           <label class="flex items-center gap-1.5 text-slate-600 cursor-pointer select-none">
             <input id="checkSelectAll" type="checkbox" class="rounded text-indigo-600 focus:ring-0">
-            <span>Seleccionar todas</span>
+            <span>Todas</span>
           </label>
-          <span id="selectedCountBadge" class="font-semibold text-indigo-600">0 sel.</span>
+          <div class="flex items-center gap-2">
+            <button type="button" id="btnClearSelection" class="text-[10px] text-rose-600 hover:text-rose-700 font-semibold underline cursor-pointer">Desmarcar</button>
+            <span id="selectedCountBadge" class="font-semibold text-indigo-600">0 sel.</span>
+          </div>
         </div>
       </div>
 
@@ -306,7 +308,6 @@
   <div id="modalPdfPreview" class="fixed inset-0 bg-slate-900/75 backdrop-blur-xs z-50 flex items-center justify-center p-3 sm:p-6 hidden">
     <div class="bg-white rounded-2xl max-w-5xl w-full h-[90vh] flex flex-col shadow-2xl border border-slate-200 overflow-hidden">
       
-      <!-- Modal Header -->
       <div class="px-5 py-3.5 bg-slate-900 text-white flex items-center justify-between gap-3">
         <div class="flex items-center gap-2.5">
           <span class="bg-indigo-600 p-1.5 rounded-lg">
@@ -329,7 +330,6 @@
         </div>
       </div>
 
-      <!-- Embedded PDF Viewer -->
       <div class="flex-1 bg-slate-700 p-2 sm:p-4 flex flex-col">
         <iframe id="pdfPreviewFrame" class="w-full h-full rounded-xl bg-white shadow-inner border-0" title="Vista previa PDF"></iframe>
       </div>
@@ -420,7 +420,7 @@
         </div>
 
         <ul class="list-disc list-inside space-y-1">
-          <li><strong>Vista Previa PDF:</strong> Genera el documento PDF real en pantalla con columnas y acordes alineados para descargarlo directamente sin abrir la ventana de impresión.</li>
+          <li><strong>Orden de selección:</strong> Marca las casillas una por una en el orden exacto que desees. Cada canción marcada sube arriba en la lista con su número (1, 2, 3...) y las flechas ▲ / ▼ te permiten reordenarlas al instante.</li>
           <li><strong>Sin Títulos / 2 Col:</strong> Acomoda todas las canciones marcadas en una hoja compacta para aprovechar todo el espacio.</li>
         </ul>
       </div>
@@ -438,7 +438,7 @@
     let appState = {
       songs: [],
       activeSongId: null,
-      selectedSongIds: new Set(),
+      selectedSongIds: [], // Array estrictamente ordenado según el clic del usuario
       viewMode: 'book',
       compactMode: true,
       fontSize: 12,
@@ -496,6 +496,12 @@
     const btnPullFromGithub = document.getElementById('btnPullFromGithub');
     const ghSyncLog = document.getElementById('ghSyncLog');
 
+    function getOrderedSelectedSongs() {
+      return appState.selectedSongIds
+        .map(id => appState.songs.find(s => s.id === id))
+        .filter(Boolean);
+    }
+
     function loadSongs() {
       try {
         const stored = localStorage.getItem(STORAGE_KEY);
@@ -516,8 +522,9 @@
 
       if (appState.songs.length > 0) {
         appState.activeSongId = appState.songs[0].id;
-        appState.selectedSongIds = new Set(appState.songs.map(s => s.id));
       }
+      // Inicia sin marcas para que selecciones en el orden exacto que desees
+      appState.selectedSongIds = [];
 
       updateGhUiState();
     }
@@ -667,20 +674,15 @@
 
         if (Array.isArray(importedSongs)) {
           appState.songs = importedSongs;
-          if (appState.songs.length > 0) {
-            appState.activeSongId = appState.songs[0].id;
-            appState.selectedSongIds = new Set(appState.songs.map(s => s.id));
-          } else {
-            appState.activeSongId = null;
-            appState.selectedSongIds.clear();
-          }
+          appState.activeSongId = appState.songs.length > 0 ? appState.songs[0].id : null;
+          appState.selectedSongIds = [];
           saveSongs();
           renderLibraryList();
           syncEditorInputs();
           renderMainDisplay();
 
           if (showToastFeedback) {
-            showToast(`${importedSongs.length} canciones descargadas de GitHub`);
+            showToast(`${importedSongs.length} canciones descargadas. Márcalas en el orden que quieras.`);
           }
           logGhStatus(`Descargadas ${importedSongs.length} canciones de GitHub`);
         }
@@ -748,10 +750,10 @@
     function generateRealPDFPreview() {
       const targetSongs = appState.viewMode === 'single'
         ? (getActiveSong() ? [getActiveSong()] : [])
-        : appState.songs.filter(s => appState.selectedSongIds.has(s.id));
+        : getOrderedSelectedSongs();
 
       if (targetSongs.length === 0) {
-        showToast('Selecciona al menos una canción para generar el PDF');
+        showToast('Marca al menos una canción en la lista para generar el PDF');
         return;
       }
 
@@ -759,7 +761,7 @@
       const doc = new jsPDF({
         orientation: 'portrait',
         unit: 'mm',
-        format: 'letter' // 215.9 x 279.4 mm
+        format: 'letter'
       });
 
       const pageWidth = doc.internal.pageSize.getWidth();
@@ -774,7 +776,6 @@
         ? (pageWidth - marginX * 2 - colGap) / 2
         : (pageWidth - marginX * 2);
 
-      // Font sizes scaled neatly for PDF
       const lyricFontSize = Math.max(8, Math.min(16, appState.fontSize * 0.78));
       const chordFontSize = lyricFontSize * 0.92;
       const lineStepWithChord = lyricFontSize * 0.85;
@@ -782,8 +783,7 @@
       const emptyLineStep = lyricFontSize * 0.35;
       const songGapStep = lyricFontSize * 0.55;
 
-      // Color choice for chords
-      let chordRGB = [15, 23, 42]; // Negro
+      let chordRGB = [15, 23, 42];
       if (appState.chordColorClass === 'text-blue-700') chordRGB = [29, 78, 216];
       if (appState.chordColorClass === 'text-red-700') chordRGB = [185, 28, 28];
 
@@ -807,7 +807,6 @@
         }
       }
 
-      // Optional Table of Contents if not in compact mode and multiple songs
       if (!appState.compactMode && appState.viewMode === 'book') {
         doc.setFont('helvetica', 'bold');
         doc.setFontSize(18);
@@ -844,12 +843,10 @@
         cursorY = marginY;
       }
 
-      // Render each song
       targetSongs.forEach((song, sIdx) => {
         const semitones = song.transpose || 0;
         const lines = (song.content || '').split('\n');
 
-        // If full mode (Con Títulos) and not compact, start each song cleanly or print header
         if (!appState.compactMode) {
           if (sIdx > 0 && appState.viewMode === 'book') {
             doc.addPage();
@@ -881,7 +878,6 @@
           doc.line(x, cursorY, x + colWidth, cursorY);
           cursorY += 5;
         } else {
-          // Compact mode: ensure at least first couple of lines fit before starting a new song block
           advanceColumnOrPage(lineStepWithChord * 2.5);
         }
 
@@ -953,7 +949,6 @@
         cursorY += songGapStep;
       });
 
-      // Generate Blob URL and open in preview modal
       const pdfBlobUrl = doc.output('bloburl');
       appState.currentPdfDoc = doc;
       appState.currentPdfFilename = appState.viewMode === 'single' && targetSongs[0]
@@ -1094,12 +1089,12 @@
       else {
         transposeControls.style.display = 'none';
 
-        const selectedList = appState.songs.filter(s => appState.selectedSongIds.has(s.id));
+        const selectedList = getOrderedSelectedSongs();
         if (selectedList.length === 0) {
           printDocument.innerHTML = `
             <div class="h-64 flex flex-col items-center justify-center text-slate-400 text-center p-6">
-              <p class="font-medium text-sm text-slate-600">No hay canciones seleccionadas para la hoja.</p>
-              <p class="text-xs text-slate-400 mt-1">Conecta GitHub arriba o marca canciones en la lista de la izquierda.</p>
+              <p class="font-medium text-sm text-slate-600">No hay canciones seleccionadas en tu hoja.</p>
+              <p class="text-xs text-slate-400 mt-1">Haz clic en las casillas de la izquierda una por una en el orden exacto que quieres imprimirlas.</p>
             </div>
           `;
           return;
@@ -1156,14 +1151,24 @@
                (s.key && s.key.toLowerCase().includes(q));
       });
 
-      songCount.textContent = appState.songs.length;
-      modeBookCount.textContent = appState.selectedSongIds.size;
-      selectedCountBadge.textContent = `${appState.selectedSongIds.size} sel.`;
+      // Ordenar visualmente: primero las seleccionadas en su orden exacto (1, 2, 3...), luego las no seleccionadas
+      const sortedFiltered = [...filtered].sort((a, b) => {
+        const idxA = appState.selectedSongIds.indexOf(a.id);
+        const idxB = appState.selectedSongIds.indexOf(b.id);
+        if (idxA !== -1 && idxB !== -1) return idxA - idxB;
+        if (idxA !== -1) return -1;
+        if (idxB !== -1) return 1;
+        return 0;
+      });
 
-      if (appState.songs.length > 0 && appState.selectedSongIds.size === appState.songs.length) {
+      songCount.textContent = appState.songs.length;
+      modeBookCount.textContent = appState.selectedSongIds.length;
+      selectedCountBadge.textContent = `${appState.selectedSongIds.length} sel.`;
+
+      if (appState.songs.length > 0 && appState.selectedSongIds.length === appState.songs.length) {
         checkSelectAll.checked = true;
         checkSelectAll.indeterminate = false;
-      } else if (appState.selectedSongIds.size > 0) {
+      } else if (appState.selectedSongIds.length > 0) {
         checkSelectAll.checked = false;
         checkSelectAll.indeterminate = true;
       } else {
@@ -1171,7 +1176,7 @@
         checkSelectAll.indeterminate = false;
       }
 
-      if (filtered.length === 0) {
+      if (sortedFiltered.length === 0) {
         songListContainer.innerHTML = `
           <div class="py-8 px-4 text-center text-xs text-slate-400">
             Tu repertorio está vacío. Haz clic en <strong>Sincronizar GitHub</strong> para descargar tus canciones o pulsa <strong>Nueva</strong>.
@@ -1181,26 +1186,52 @@
       }
 
       let html = '';
-      filtered.forEach((song) => {
+      sortedFiltered.forEach((song) => {
         const isActive = (song.id === appState.activeSongId);
-        const isChecked = appState.selectedSongIds.has(song.id);
+        const orderIndex = appState.selectedSongIds.indexOf(song.id);
+        const isChecked = orderIndex !== -1;
 
         html += `
-          <div class="group flex items-center gap-2.5 p-2.5 rounded-xl transition cursor-pointer ${isActive ? 'bg-indigo-50/80 border border-indigo-200' : 'hover:bg-slate-50'}" onclick="selectActiveSong('${song.id}')">
-            <input type="checkbox" ${isChecked ? 'checked' : ''} class="rounded text-indigo-600 focus:ring-0 cursor-pointer" onclick="event.stopPropagation(); toggleSongSelection('${song.id}')">
+          <div class="group flex items-center gap-2 p-2.5 rounded-xl transition cursor-pointer ${isActive ? 'bg-indigo-50/80 border border-indigo-200' : 'hover:bg-slate-50'}" onclick="selectActiveSong('${song.id}')">
+            <input type="checkbox" ${isChecked ? 'checked' : ''} class="rounded text-indigo-600 focus:ring-0 cursor-pointer shrink-0" onclick="event.stopPropagation(); toggleSongSelection('${song.id}')">
             <div class="flex-1 min-w-0">
-              <div class="flex items-center justify-between">
-                <h4 class="text-xs font-bold truncate ${isActive ? 'text-indigo-950' : 'text-slate-800'}">${escapeHtml(song.title || 'Sin Título')}</h4>
-                ${song.key ? `<span class="text-[10px] font-mono font-bold bg-slate-200/80 text-slate-700 px-1 rounded">${escapeHtml(song.key)}</span>` : ''}
+              <div class="flex items-center justify-between gap-1">
+                <h4 class="text-xs font-bold truncate ${isActive ? 'text-indigo-950' : 'text-slate-800'}">
+                  ${isChecked ? `<span class="inline-flex items-center justify-center w-4 h-4 mr-1 text-[10px] font-bold bg-indigo-600 text-white rounded-full">${orderIndex + 1}</span>` : ''}
+                  ${escapeHtml(song.title || 'Sin Título')}
+                </h4>
+                ${song.key ? `<span class="text-[10px] font-mono font-bold bg-slate-200/80 text-slate-700 px-1 rounded shrink-0">${escapeHtml(song.key)}</span>` : ''}
               </div>
               <p class="text-[11px] text-slate-400 truncate">${escapeHtml(song.artist || '')}</p>
             </div>
+            ${isChecked ? `
+              <div class="flex flex-col gap-0.5 shrink-0" onclick="event.stopPropagation()">
+                <button type="button" onclick="moveSelectedSong('${song.id}', -1)" class="text-[9px] leading-none px-1 py-0.5 bg-slate-100 hover:bg-indigo-100 text-slate-600 hover:text-indigo-700 rounded cursor-pointer" title="Subir orden">▲</button>
+                <button type="button" onclick="moveSelectedSong('${song.id}', 1)" class="text-[9px] leading-none px-1 py-0.5 bg-slate-100 hover:bg-indigo-100 text-slate-600 hover:text-indigo-700 rounded cursor-pointer" title="Bajar orden">▼</button>
+              </div>
+            ` : ''}
           </div>
         `;
       });
 
       songListContainer.innerHTML = html;
     }
+
+    window.moveSelectedSong = function(id, delta) {
+      const idx = appState.selectedSongIds.indexOf(id);
+      if (idx === -1) return;
+      const newIdx = idx + delta;
+      if (newIdx < 0 || newIdx >= appState.selectedSongIds.length) return;
+
+      const temp = appState.selectedSongIds[idx];
+      appState.selectedSongIds[idx] = appState.selectedSongIds[newIdx];
+      appState.selectedSongIds[newIdx] = temp;
+
+      renderLibraryList();
+      if (appState.viewMode === 'book') {
+        renderMainDisplay();
+      }
+    };
 
     function syncEditorInputs() {
       const song = getActiveSong();
@@ -1226,10 +1257,11 @@
     };
 
     window.toggleSongSelection = function(id) {
-      if (appState.selectedSongIds.has(id)) {
-        appState.selectedSongIds.delete(id);
+      const idx = appState.selectedSongIds.indexOf(id);
+      if (idx !== -1) {
+        appState.selectedSongIds.splice(idx, 1);
       } else {
-        appState.selectedSongIds.add(id);
+        appState.selectedSongIds.push(id);
       }
       renderLibraryList();
       if (appState.viewMode === 'book') {
@@ -1247,14 +1279,14 @@
         content: `//[C]Escribe aquí la letra con [G]acordes//`
       };
 
-      appState.songs.unshift(newSong);
+      appState.songs.push(newSong);
       appState.activeSongId = newSong.id;
-      appState.selectedSongIds.add(newSong.id);
+      appState.selectedSongIds.push(newSong.id);
       saveSongs();
       renderLibraryList();
       syncEditorInputs();
       renderMainDisplay();
-      showToast('Nueva canción creada');
+      showToast('Nueva canción agregada al final');
     }
 
     function showToast(msg) {
@@ -1364,14 +1396,23 @@
 
     checkSelectAll.addEventListener('change', (e) => {
       if (e.target.checked) {
-        appState.selectedSongIds = new Set(appState.songs.map(s => s.id));
+        appState.selectedSongIds = appState.songs.map(s => s.id);
       } else {
-        appState.selectedSongIds.clear();
+        appState.selectedSongIds = [];
       }
       renderLibraryList();
       if (appState.viewMode === 'book') {
         renderMainDisplay();
       }
+    });
+
+    document.getElementById('btnClearSelection').addEventListener('click', () => {
+      appState.selectedSongIds = [];
+      renderLibraryList();
+      if (appState.viewMode === 'book') {
+        renderMainDisplay();
+      }
+      showToast('Selección limpiada. Marca en el orden que desees.');
     });
 
     modeSingleBtn.addEventListener('click', () => {
@@ -1459,9 +1500,9 @@
         id: 'song-' + Date.now(),
         title: `${song.title} (Copia)`
       };
-      appState.songs.unshift(copy);
+      appState.songs.push(copy);
       appState.activeSongId = copy.id;
-      appState.selectedSongIds.add(copy.id);
+      appState.selectedSongIds.push(copy.id);
       saveSongs();
       renderLibraryList();
       syncEditorInputs();
@@ -1475,7 +1516,7 @@
 
       const origTitle = song.title;
       appState.songs = appState.songs.filter(s => s.id !== song.id);
-      appState.selectedSongIds.delete(song.id);
+      appState.selectedSongIds = appState.selectedSongIds.filter(id => id !== song.id);
 
       appState.activeSongId = appState.songs.length > 0 ? appState.songs[0].id : null;
       saveSongs();
@@ -1507,12 +1548,12 @@
           if (Array.isArray(imported)) {
             appState.songs = imported;
             appState.activeSongId = imported.length > 0 ? imported[0].id : null;
-            appState.selectedSongIds = new Set(imported.map(s => s.id));
+            appState.selectedSongIds = [];
             saveSongs();
             renderLibraryList();
             syncEditorInputs();
             renderMainDisplay();
-            showToast('Repertorio importado exitosamente');
+            showToast('Repertorio importado. Marca las canciones en el orden que desees.');
           } else {
             showToast('Formato JSON no válido');
           }
